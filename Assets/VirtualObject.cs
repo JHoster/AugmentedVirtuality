@@ -20,20 +20,34 @@ public class VirtualObject : MonoBehaviour
   //public GameObject LPA; //Last Point Annotation
   public Vector3 view;
   public Vector3 up;
+  public bool fade;
+  public float fadeUntil = 0.1f; //Min alpha value in percent
+  private Color colour;
+  private Color colourOrg;
+  public float timeToFade = 1.0f;
 
   // Start is called before the first frame update
   void Awake()
   {
     DontDestroyOnLoad(transform.gameObject);
   }
+  void Start()
+  {
+    colour = gameObject.transform.GetChild(0).GetComponent<MeshRenderer>().material.color;
+    colourOrg = colour;
+  }
 
   // Update is called once per frame
   void Update()
   {
-    TA = GameObject.Find("Transform Annotation").transform;
-    PLA = GameObject.Find("Point List Annotation").transform;
+    if(GameObject.Find("Transform Annotation"))
+      TA = GameObject.Find("Transform Annotation").transform;
+    if(GameObject.Find("Point List Annotation"))
+      PLA = GameObject.Find("Point List Annotation").transform;
+    if (fade)
+      gameObject.transform.GetChild(0).GetComponent<MeshRenderer>().material.color = colour;
 
-    if (TA)
+    if (PLA.gameObject.active && TA.gameObject.active)
     {
       //Position:
       transform.position = TA.position;
@@ -62,8 +76,17 @@ public class VirtualObject : MonoBehaviour
 
       //ToDO:
       //Make translation from current shape to next 3D Bounding box
+      //Make virtual Object stay in 2D Bounding box, if no 3D Bounding box available
+      //Done:
       //Hide or fade out virtual Object when there is no real object detected
       //Show where virtual Object was last detected (so that cup can be placed on desk again)
+
+      if (fade)
+        colour = colourOrg;
+    }
+    else if(fade && colour.a > fadeUntil)
+    {
+      colour.a -= Time.deltaTime/timeToFade;
     }
   }
 }
