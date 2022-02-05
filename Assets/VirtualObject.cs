@@ -2,12 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-//using Mediapipe.Unity;
+using Mediapipe.Unity;
 
 public class VirtualObject : MonoBehaviour
 {
   //public Transform CenterPosition;
   public Transform TA; //Transform Annotation
+  public bool smoothTransform;
+  public bool smoothScaling;
+  public bool smoothRotation;
+  public float smoothFactor = 2;
   public Transform xArrow;
   public Transform yArrow;
   public Transform zArrow;
@@ -20,6 +24,15 @@ public class VirtualObject : MonoBehaviour
   public GameObject FPA; //Fourth Point Annotation
   public GameObject SiPA; //Sixth Point Annotation
   //public GameObject LPA; //Last Point Annotation
+  //Position
+  public Transform MBRA; //MultiBoxRects Annotation
+  //public Vector3 TL; //Top left
+  public Vector3 TR; //Top right
+  public Vector3 TRW; //Top right in world space
+  public Vector3 BL; //Bottom left
+  public Vector3 BLW; //Bottom left in world space
+  //public Vector3 BR; //Bottom right
+  //Rotation
   public Vector3 view;
   public Vector3 side;
   public Vector3 up;
@@ -28,27 +41,15 @@ public class VirtualObject : MonoBehaviour
   public bool freezeY; //Fix y-Axis for rotation
   //Fade
   public bool fade;
-  private Component[] children;
-  public float fadeUntil = 0.1f; //Min alpha value in percent
-  private Color colour;
-  private Color colourOrg;
+  public Component[] children;
+  public float fadeUntil = 0;//0.1f; //Min alpha value in percent
+  public Color colour;
+  public Color colourOrg;
   public float timeToFade = 1.0f;
   //Disable Image
   public GameObject CP; //ContainerPanel
   private RawImage camImage;
   private bool disabledUI;
-
-  // Start is called before the first frame update
-  void Awake()
-  {
-    DontDestroyOnLoad(transform.gameObject);
-  }
-  void Start()
-  {
-    children = gameObject.transform.GetComponentsInChildren<MeshRenderer>();
-    colour = gameObject.transform.GetComponentInChildren<MeshRenderer>().material.color;
-    colourOrg = colour;
-  }
 
   // Update is called once per frame
   void Update()
@@ -65,16 +66,31 @@ public class VirtualObject : MonoBehaviour
 
     if (GameObject.Find("Transform Annotation"))
       TA = GameObject.Find("Transform Annotation").transform;
-    if(GameObject.Find("Point List Annotation"))
+    if (GameObject.Find("Point List Annotation"))
       PLA = GameObject.Find("Point List Annotation").transform;
-    if (fade)
-      foreach(MeshRenderer MR in children)
-        MR.material.color = colour;
+    if (GameObject.Find("MultiBoxRects Annotation"))
+      MBRA = GameObject.Find("MultiBoxRects Annotation").transform;
+    if (fade && children.Length > 0)
+    {
+      if (children.Length > 0)
+        foreach (MeshRenderer MR in children)
+          if(MR.materials.Length == 1)
+            MR.material.color = new Color(MR.material.color.r, MR.material.color.g, MR.material.color.b, colour.a);
+          else
+          {
+            foreach (Material mat in MR.materials)
+              mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, colour.a); ;
+          }
+    }
+
 
     if (PLA && PLA.gameObject.activeInHierarchy && TA && TA.gameObject.activeInHierarchy)
     {
       //Position:
-      transform.position = TA.position;
+      if (smoothTransform)
+        transform.position = Vector3.Lerp(transform.position, TA.position, Time.deltaTime * smoothFactor);
+      else
+        transform.position = TA.position;
       //Scale:
       SePA = PLA.transform.GetChild(1).gameObject;
       TPA = PLA.transform.GetChild(2).gameObject;
@@ -85,7 +101,10 @@ public class VirtualObject : MonoBehaviour
       depth = Vector3.Distance(SePA.transform.position, TPA.transform.position);
       height = Vector3.Distance(SePA.transform.position, FPA.transform.position);
       width = Vector3.Distance(SePA.transform.position, SiPA.transform.position);
-      transform.localScale = new Vector3(width, height, depth);
+      if (smoothScaling)
+        transform.localScale = Vector3.Slerp(transform.localScale, new Vector3(width, height, depth), Time.deltaTime * smoothFactor);
+      else
+        transform.localScale = new Vector3(width, height, depth);
       //Old scaling approach:
       ////transform.localScale = new Vector3(xArrow.transform.position.x - transform.position.x, yArrow.transform.position.y - transform.position.y, zArrow.transform.position.z - transform.position.z);
 
@@ -106,11 +125,11 @@ public class VirtualObject : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(view, up);
         Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, transform.position + up, 0.5f));
         Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, zAxisDir, 0.5f));
-          //Debug.DrawLine(SiPA.transform.position, Vector3.Lerp(SiPA.transform.position, FPA.transform.position, 0.5f));
-          //Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, zAxisDir, 0.5f));
-          //Vector3 TFPA = 1 / 2 * (TPA.transform.position - FPA.transform.position); //Vector pointing to middle between Third and Fourth PA
-          //Vector3 SeTFPA = 1 / 2 * (SePA.transform.position - TPA.transform.position); //Vector pointing to middle between Second and Third PA
-          //Debug.DrawLine(SePA.transform.position, TPA.transform.position);
+        //Debug.DrawLine(SiPA.transform.position, Vector3.Lerp(SiPA.transform.position, FPA.transform.position, 0.5f));
+        //Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, zAxisDir, 0.5f));
+        //Vector3 TFPA = 1 / 2 * (TPA.transform.position - FPA.transform.position); //Vector pointing to middle between Third and Fourth PA
+        //Vector3 SeTFPA = 1 / 2 * (SePA.transform.position - TPA.transform.position); //Vector pointing to middle between Second and Third PA
+        //Debug.DrawLine(SePA.transform.position, TPA.transform.position);
       }
       else
       {
@@ -125,35 +144,68 @@ public class VirtualObject : MonoBehaviour
         {
           //Vielleicht y festsetzen und nur x und z rotieren lassen? Objekte werden eh nur aufrecht erkannt.
           //Stimmt, aber funktioniert nicht, sobald die Kamera geneigt wird
-          Quaternion look = Quaternion.LookRotation(view, up);
-          Debug.Log(look);
-          Debug.Log(look.eulerAngles);
+          Quaternion lookZ = Quaternion.LookRotation(view, up);
+          Debug.Log(Vector3.Angle(transform.up, up));
+          float AngleY = Vector3.Angle(transform.up, up); //Angle between objects y-Axis and Bounding Box y-Axis
+          //Debug.Log(look);
+          //Debug.Log(look.eulerAngles);
           //transform.rotation = Quaternion.Euler(look.eulerAngles.x, 0, look.eulerAngles.z);
-          transform.rotation = Quaternion.Euler(0, look.eulerAngles.y, 0);
+          //Debug.Log(lookZ.eulerAngles);
+          transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, 0); //Only rotation around y-Axis
+          //transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, lookZ.eulerAngles.z); //Only rotation around y-Axis and z-Axis
+          //transform.rotation = Quaternion.Euler(AngleY, lookZ.eulerAngles.y, lookZ.eulerAngles.z);
+          //transform.LookAt(new Vector3(zArrow.transform.position.x,zArrow.transform.position.y, zArrow.transform.position.z));
           //Align x-Axis? //add angle between Object x-Axis and Bounding box x-Axis to rotation around y-Axis
         }
         else
         {
           //transform.rotation = Quaternion.FromToRotation(view, up);
-          transform.rotation = Quaternion.LookRotation(view, up);
+          if (smoothRotation)
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(view, up), Time.deltaTime * smoothFactor);
+          else
+            transform.rotation = Quaternion.LookRotation(view, up);
           //transform.LookAt(zArrow); //or yArrow for chlild object
         }
       }
 
       //ToDO:
       //Improve rotation
-      //Make translation from current shape to next 3D Bounding box
       //Make virtual Object stay in 2D Bounding box, if no 3D Bounding box available
+      //Show where virtual Object was last detected in world space (so that cup can be placed on desk again)
       //Done:
+      //Make smooth translation from current shape to next 3D Bounding box
       //Hide or fade out virtual Object when there is no real object detected
-      //Show where virtual Object was last detected (so that cup can be placed on desk again)
 
       if (fade)
         colour = colourOrg;
     }
-    else if(fade && colour.a > fadeUntil)
+    //else if (MBRA && MBRA.gameObject.activeInHierarchy) //Use 2D Bounding Box for positioning
+    //{
+    //  //Debug.Log(MBRA.GetChild(0).GetComponent<LineRenderer>().GetPosition(0));
+    //  BL = MBRA.GetChild(0).GetComponent<LineRenderer>().GetPosition(0);
+    //  BLW = Camera.main.ScreenToWorldPoint(new Vector3(2 * BL.x, transform.TransformPoint(MBRA.transform.position).y + 2 * BL.y, transform.TransformPoint(MBRA.transform.position).z));
+    //  //BLW = transform.TransformPoint(MBRA.transform.GetChild(0).transform.position) + Camera.main.ScreenToWorldPoint(new Vector3(2 * BL.x, 2 * BL.y, 1));
+    //  //Debug.Log(transform.TransformPoint(MBRA.transform.position + Camera.main.ScreenToWorldPoint(BL)));
+    //  //BL = transform.TransformPoint(BL);
+    //  //TL = MBRA.GetChild(0).GetComponent<LineRenderer>().GetPosition(1);
+    //  TR = MBRA.GetChild(0).GetComponent<LineRenderer>().GetPosition(2);
+    //  TRW = Camera.main.ScreenToWorldPoint(new Vector3(2 * TR.x, transform.TransformPoint(MBRA.transform.position).y + 2 * TR.y, transform.TransformPoint(MBRA.transform.position).z));
+
+    //  Debug.DrawLine(BL, TR, colour = Color.blue);
+    //  Debug.DrawLine(BLW, Vector3.Lerp(BLW,TRW,0.75f), colour = Color.red);
+
+    //  //TR = transform.TransformPoint(TR);
+    //  //BR = MBRA.GetChild(0).GetComponent<LineRenderer>().GetPosition(3);
+    //  //Debug.Log(Vector3.Lerp(BL, TR, 0.5f));
+    //  //Debug.Log(Vector3.Lerp(BR, TL, 0.5f));
+    //  //Debug.Log(Vector3.Lerp(BR, TL, 0.5f) == Vector3.Lerp(BL, TR, 0.5f));
+    //  //Debug.DrawLine(Vector3.zero, Vector3.Lerp(BL, TR, 0.5f));
+    //  //transform.position = Vector3.Lerp(BL, TR, 0.5f);
+    //  //Debug.Log(Camera.main.ScreenToWorldPoint(Vector3.Lerp(BL, TR, 0.5f)));
+    //}
+    else if (fade && colour.a > fadeUntil)
     {
-      colour.a -= Time.deltaTime/timeToFade;
+      colour.a -= Time.deltaTime / timeToFade;
     }
   }
 }
