@@ -15,6 +15,8 @@ public class VirtualObject : MonoBehaviour
   public Transform xArrow;
   public Transform yArrow;
   public Transform zArrow;
+  public bool zArrowFix; //Rotate z-Arrow to make it orthogonal
+  public float zArrowRot = 90; //Angle z-Arrow
   public Transform PLA; //Point List Annotation
   private float depth;
   private float width;
@@ -38,7 +40,8 @@ public class VirtualObject : MonoBehaviour
   public Vector3 up;
   public bool rotateWithPLA;
   public GameObject AL;
-  public bool freezeY; //Fix y-Axis for rotation
+  public bool noXrot; //Set rotation around x-Axis to zero
+  public bool noZrot; //Set rotation around z-Axis to zero
   //Fade
   public bool fade;
   public Component[] children;
@@ -50,10 +53,18 @@ public class VirtualObject : MonoBehaviour
   public GameObject CP; //ContainerPanel
   private RawImage camImage;
   private bool disabledUI;
+  public bool disabledAnnotation;
 
   // Update is called once per frame
   void Update()
   {
+    if (GameObject.Find("Transform Annotation"))
+      TA = GameObject.Find("Transform Annotation").transform;
+    if (GameObject.Find("Point List Annotation"))
+      PLA = GameObject.Find("Point List Annotation").transform;
+    if (GameObject.Find("MultiBoxRects Annotation"))
+      MBRA = GameObject.Find("MultiBoxRects Annotation").transform;
+
     if (!disabledUI && GameObject.Find("Container Panel")) //Disable UI images and make camImage transparent, so that Virtual Object can be seen
     {
       disabledUI = true;
@@ -63,13 +74,22 @@ public class VirtualObject : MonoBehaviour
       camImage = CP.transform.GetChild(0).transform.GetChild(0).GetComponent<RawImage>();
       camImage.color = new Color(camImage.color.r, camImage.color.g, camImage.color.b, 0.5f);
     }
+    if (disabledAnnotation && PLA)
+    {
+      AL = PLA.transform.parent.transform.parent.transform.parent.gameObject;
+      foreach (MeshRenderer mr in AL.GetComponentsInChildren<MeshRenderer>())
+        mr.enabled = false;
+      foreach (LineRenderer lr in AL.GetComponentsInChildren<LineRenderer>())
+        lr.enabled = false;
+    }
+    else if(AL)
+    {
+      foreach (MeshRenderer mr in AL.GetComponentsInChildren<MeshRenderer>())
+        mr.enabled = true;
+      foreach (LineRenderer lr in AL.GetComponentsInChildren<LineRenderer>())
+        lr.enabled = true;
+    }
 
-    if (GameObject.Find("Transform Annotation"))
-      TA = GameObject.Find("Transform Annotation").transform;
-    if (GameObject.Find("Point List Annotation"))
-      PLA = GameObject.Find("Point List Annotation").transform;
-    if (GameObject.Find("MultiBoxRects Annotation"))
-      MBRA = GameObject.Find("MultiBoxRects Annotation").transform;
     if (fade && children.Length > 0)
     {
       if (children.Length > 0)
@@ -137,28 +157,46 @@ public class VirtualObject : MonoBehaviour
         xArrow = TA.transform.GetChild(0).GetChild(0);
         yArrow = TA.transform.GetChild(1).GetChild(0);
         zArrow = TA.transform.GetChild(2).GetChild(0);
-        view = zArrow.transform.position - transform.position;
-        side = xArrow.transform.position - transform.position;
-        up = yArrow.transform.position - transform.position;
-        if (freezeY) //works good if cam view is parallel to ground
+        view = zArrow.transform.position - TA.position;
+        side = xArrow.transform.position - TA.position;
+        up = yArrow.transform.position - TA.position;
+        if (noXrot) //works good if cam view is parallel to ground
         {
           //Vielleicht y festsetzen und nur x und z rotieren lassen? Objekte werden eh nur aufrecht erkannt.
           //Stimmt, aber funktioniert nicht, sobald die Kamera geneigt wird
           Quaternion lookZ = Quaternion.LookRotation(view, up);
-          Debug.Log(Vector3.Angle(transform.up, up));
-          float AngleY = Vector3.Angle(transform.up, up); //Angle between objects y-Axis and Bounding Box y-Axis
+          //Debug.Log(Vector3.Angle(transform.up, up));
+          //float AngleY = Vector3.Angle(transform.up, up); //Angle between objects y-Axis and Bounding Box y-Axis
           //Debug.Log(look);
           //Debug.Log(look.eulerAngles);
           //transform.rotation = Quaternion.Euler(look.eulerAngles.x, 0, look.eulerAngles.z);
           //Debug.Log(lookZ.eulerAngles);
-          transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, 0); //Only rotation around y-Axis
-          //transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, lookZ.eulerAngles.z); //Only rotation around y-Axis and z-Axis
+          if(noZrot)
+            transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, 0); //Only rotation around y-Axis
+          else
+            transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, lookZ.eulerAngles.z); //Only rotation around y-Axis and z-Axis
           //transform.rotation = Quaternion.Euler(AngleY, lookZ.eulerAngles.y, lookZ.eulerAngles.z);
           //transform.LookAt(new Vector3(zArrow.transform.position.x,zArrow.transform.position.y, zArrow.transform.position.z));
           //Align x-Axis? //add angle between Object x-Axis and Bounding box x-Axis to rotation around y-Axis
         }
         else
         {
+          if (zArrowFix)
+          {
+            // Vector3.Angle(view, up) + zArrowRot = 90
+            //zArrowRot = 90 - Vector3.Angle(view, TA.position + up);
+            //Debug.Log(Vector3.Angle(view, TA.position + up));
+            //Debug.DrawLine(TA.position, TA.position + view, colour = Color.blue);
+            //Debug.DrawLine(TA.position, TA.position + up, colour = Color.green);
+            zArrow.transform.parent.transform.eulerAngles = new Vector3(zArrowRot, 0, 0);
+            //Debug.Log(zArrowRot + Vector3.Angle(view, transform.position + up));
+            //Debug.Log(Vector3.Angle(view, TA.position + up)); // should be 90°
+            //Debug.Log(Vector3.Angle(view, TA.position + up)); // should be 90°
+            //Debug.Log(Vector3.Dot(view, transform.position + up)); // should be 0
+
+          }
+          else
+            zArrow.transform.parent.transform.eulerAngles = Vector3.zero;
           //transform.rotation = Quaternion.FromToRotation(view, up);
           if (smoothRotation)
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(view, up), Time.deltaTime * smoothFactor);
@@ -172,6 +210,7 @@ public class VirtualObject : MonoBehaviour
       //Improve rotation
       //Make virtual Object stay in 2D Bounding box, if no 3D Bounding box available
       //Show where virtual Object was last detected in world space (so that cup can be placed on desk again)
+      //Create VOs for multiple bounding boxes
       //Done:
       //Make smooth translation from current shape to next 3D Bounding box
       //Hide or fade out virtual Object when there is no real object detected

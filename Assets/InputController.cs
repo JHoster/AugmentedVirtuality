@@ -12,6 +12,7 @@ public class InputController : MonoBehaviour
   public GameObject active;
   private int selected;
   public string cat;
+  private bool inactive;
   void Awake()
   {
     DontDestroyOnLoad(transform.gameObject);
@@ -32,12 +33,29 @@ public class InputController : MonoBehaviour
     if (GameObject.Find("Main Canvas"))
       MC = GameObject.Find("Main Canvas").transform.gameObject;
 
-
-    if (Input.GetKeyDown(KeyCode.Backspace))
+    if (Input.GetKeyDown(KeyCode.Alpha9))
+      active.GetComponent<VirtualObject>().disabledAnnotation = !active.GetComponent<VirtualObject>().disabledAnnotation;
+    if (Input.GetKeyDown(KeyCode.Alpha0))
+      inactive =  !inactive;
+    if(inactive)
     {
-      chair.SetActive(false);
-      cup.SetActive(false);
+      active.SetActive(false);
+      //chair.SetActive(false);
+      //cup.SetActive(false);
     }
+    if(Input.GetKeyDown(KeyCode.F))
+      active.GetComponent<VirtualObject>().fade = !active.GetComponent<VirtualObject>().fade;
+    if (Input.GetKeyDown(KeyCode.S))
+    {
+      active.GetComponent<VirtualObject>().smoothTransform = !active.GetComponent<VirtualObject>().smoothTransform;
+      active.GetComponent<VirtualObject>().smoothRotation = !active.GetComponent<VirtualObject>().smoothRotation;
+      active.GetComponent<VirtualObject>().smoothScaling = !active.GetComponent<VirtualObject>().smoothScaling;
+    }
+    if (Input.GetKeyDown(KeyCode.Z))
+      active.GetComponent<VirtualObject>().zArrowFix = !active.GetComponent<VirtualObject>().zArrowFix;
+
+    if (Input.GetKey("escape"))
+      Application.Quit();
 
     //if (!active)
     //  active = cup;
@@ -61,7 +79,8 @@ public class InputController : MonoBehaviour
         active = cup;
         chair.SetActive(false);
       }
-      active.gameObject.SetActive(true);
+      if(!inactive)
+        active.gameObject.SetActive(true);
     }
 
     //if (Input.GetKeyDown(KeyCode.C))
