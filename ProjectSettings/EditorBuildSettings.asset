@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Mediapipe/Samples/Scenes/Start Scene.unity
     guid: f7b359c19e6ae2d208e5ca4608b7c0b8
   - enabled: 0
+    path: Assets/Mediapipe/Samples/Scenes/Hello World/Hello World.unity
+    guid: 53a2aa9aa858889f3a8f3385dfad67ee
+  - enabled: 0
     path: Assets/Mediapipe/Samples/Scenes/Face Detection/Face Detection.unity
     guid: 17a223a9abd188eb6b6656cf37880d62
   - enabled: 0
@@ -43,9 +46,16 @@ EditorBuildSettings:
       Tracking.unity
     guid: fd2061009efe0e91f871cdb03fdc5fb5
   - enabled: 0
-    path: Assets/Mediapipe/Samples/Scenes/Hello World/Hello World.unity
-    guid: 53a2aa9aa858889f3a8f3385dfad67ee
-  - enabled: 0
     path: Assets/Mediapipe/Samples/Scenes/MediaPipe Video/MediaPipe Video.unity
     guid: 16062faf4cda54140b781b925351b119
-  m_configObjects: {}
+  m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 57b3184d4fc237941a7dc29e4acc6829,
+      type: 2}
+    Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: d30a8466fdb1e354fb95992bd458f6b8,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 9b519e3144229e447b2414d086781441,
+      type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 40e57f57bb687984992baf9042d3dbfb,
+      type: 2}
+    xr.sdk.mock-hmd.settings: {fileID: 11400000, guid: 11926fb9bad5edb469f269b109285156,
+      type: 2}
