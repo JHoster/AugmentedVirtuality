@@ -52,6 +52,8 @@ namespace Mediapipe.Unity
       Camera = 0,
       Image = 1,
       Video = 2,
+      SteamVR = 3,
+      CamTexture = 4,
     }
 
     public ResolutionStruct resolution { get; protected set; }

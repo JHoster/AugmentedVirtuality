@@ -18,6 +18,16 @@ namespace Mediapipe.Unity
 
       switch (sourceType)
       {
+        case ImageSource.SourceType.CamTexture:
+          {
+            ImageSource = obj.GetComponent<CamTextSource>();
+            break;
+          }
+        case ImageSource.SourceType.SteamVR:
+          {
+            ImageSource = obj.GetComponent<SteamVRCam>();
+            break;
+          }
         case ImageSource.SourceType.Camera:
           {
             ImageSource = obj.GetComponent<WebCamSource>();
