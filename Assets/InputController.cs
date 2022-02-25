@@ -43,7 +43,11 @@ public class InputController : MonoBehaviour
       //chair.SetActive(false);
       //cup.SetActive(false);
     }
-    if(Input.GetKeyDown(KeyCode.F))
+    if (Input.GetKeyDown(KeyCode.C))
+      active.GetComponent<VirtualObject>().camView = !active.GetComponent<VirtualObject>().camView;
+    if (Input.GetKeyDown(KeyCode.M))
+      active.GetComponent<VirtualObject>().camMask = !active.GetComponent<VirtualObject>().camMask;
+    if (Input.GetKeyDown(KeyCode.F))
       active.GetComponent<VirtualObject>().fade = !active.GetComponent<VirtualObject>().fade;
     if (Input.GetKeyDown(KeyCode.S))
     {

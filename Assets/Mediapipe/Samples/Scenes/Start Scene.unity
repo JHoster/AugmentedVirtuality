@@ -7168,7 +7168,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &888314176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7813,26 +7813,10 @@ MonoBehaviour:
   smoothScaling: 0
   smoothRotation: 0
   smoothFactor: 2
-  xArrow: {fileID: 0}
-  yArrow: {fileID: 0}
-  zArrow: {fileID: 0}
   zArrowFix: 0
   zArrowRot: 0
-  PLA: {fileID: 0}
-  SePA: {fileID: 0}
-  TPA: {fileID: 0}
-  FPA: {fileID: 0}
-  SiPA: {fileID: 0}
   MBRA: {fileID: 0}
-  TR: {x: 0, y: 0, z: 0}
-  TRW: {x: 0, y: 0, z: 0}
-  BL: {x: 0, y: 0, z: 0}
-  BLW: {x: 0, y: 0, z: 0}
-  view: {x: 0, y: 0, z: 0}
-  side: {x: 0, y: 0, z: 0}
-  up: {x: 0, y: 0, z: 0}
   rotateWithPLA: 0
-  AL: {fileID: 0}
   noXrot: 0
   noZrot: 0
   fade: 0
@@ -7840,9 +7824,19 @@ MonoBehaviour:
   fadeUntil: 0
   colour: {r: 0, g: 0, b: 0, a: 0}
   colourOrg: {r: 0, g: 0, b: 0, a: 0}
-  timeToFade: 1
   CP: {fileID: 0}
   disabledAnnotation: 0
+  camView: 0
+  camMask: 0
+  cam: {fileID: 0}
+  positionCenter: {x: 0, y: 0, z: 0}
+  positionVP: {x: 0, y: 0, z: 0}
+  positionScreen: {x: 0, y: 0, z: 0}
+  extraWidth: 1
+  extraHeight: 1
+  width2World: 0
+  height2World: 0
+  scaleFac: 0
 --- !u!65 &964276551
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8654,36 +8648,30 @@ MonoBehaviour:
   smoothScaling: 1
   smoothRotation: 1
   smoothFactor: 10
-  xArrow: {fileID: 0}
-  yArrow: {fileID: 0}
-  zArrow: {fileID: 0}
-  zArrowFix: 1
+  zArrowFix: 0
   zArrowRot: 45
-  PLA: {fileID: 0}
-  SePA: {fileID: 0}
-  TPA: {fileID: 0}
-  FPA: {fileID: 0}
-  SiPA: {fileID: 0}
   MBRA: {fileID: 0}
-  TR: {x: 0, y: 0, z: 0}
-  TRW: {x: 0, y: 0, z: 0}
-  BL: {x: 0, y: 0, z: 0}
-  BLW: {x: 0, y: 0, z: 0}
-  view: {x: 0, y: 0, z: 0}
-  side: {x: 0, y: 0, z: 0}
-  up: {x: 0, y: 0, z: 0}
   rotateWithPLA: 0
-  AL: {fileID: 0}
-  noXrot: 0
-  noZrot: 0
+  noXrot: 1
+  noZrot: 1
   fade: 1
   children: []
-  fadeUntil: 0
+  fadeUntil: 0.5
   colour: {r: 0, g: 0, b: 0, a: 0}
   colourOrg: {r: 0, g: 0, b: 0, a: 0}
-  timeToFade: 1
   CP: {fileID: 0}
   disabledAnnotation: 0
+  camView: 1
+  camMask: 1
+  cam: {fileID: 0}
+  positionCenter: {x: 0, y: 0, z: 0}
+  positionVP: {x: 0, y: 0, z: 0}
+  positionScreen: {x: 0, y: 0, z: 0}
+  extraWidth: 150
+  extraHeight: 0
+  width2World: 0
+  height2World: 0
+  scaleFac: 0
 --- !u!4 &1045218744
 Transform:
   m_ObjectHideFlags: 0
@@ -15374,36 +15362,30 @@ MonoBehaviour:
   smoothScaling: 1
   smoothRotation: 1
   smoothFactor: 10
-  xArrow: {fileID: 0}
-  yArrow: {fileID: 0}
-  zArrow: {fileID: 0}
   zArrowFix: 0
   zArrowRot: 45
-  PLA: {fileID: 0}
-  SePA: {fileID: 0}
-  TPA: {fileID: 0}
-  FPA: {fileID: 0}
-  SiPA: {fileID: 0}
   MBRA: {fileID: 0}
-  TR: {x: 0, y: 0, z: 0}
-  TRW: {x: 0, y: 0, z: 0}
-  BL: {x: 0, y: 0, z: 0}
-  BLW: {x: 0, y: 0, z: 0}
-  view: {x: 0, y: 0, z: 0}
-  side: {x: 0, y: 0, z: 0}
-  up: {x: 0, y: 0, z: 0}
   rotateWithPLA: 0
-  AL: {fileID: 0}
-  noXrot: 0
-  noZrot: 0
+  noXrot: 1
+  noZrot: 1
   fade: 1
   children: []
-  fadeUntil: 0
+  fadeUntil: 0.5
   colour: {r: 0, g: 0, b: 0, a: 0}
   colourOrg: {r: 0, g: 0, b: 0, a: 0}
-  timeToFade: 1
   CP: {fileID: 0}
   disabledAnnotation: 0
+  camView: 1
+  camMask: 1
+  cam: {fileID: 0}
+  positionCenter: {x: 0, y: 0, z: 0}
+  positionVP: {x: 0, y: 0, z: 0}
+  positionScreen: {x: 0, y: 0, z: 0}
+  extraWidth: 150
+  extraHeight: 150
+  width2World: 0
+  height2World: 0
+  scaleFac: 0
 --- !u!1 &2060208973
 GameObject:
   m_ObjectHideFlags: 0
