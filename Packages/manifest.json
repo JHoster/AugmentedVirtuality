@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.htc.upm.vivehandtracking": "1.0.0",
     "com.unity.2d.animation": "5.0.9",
     "com.unity.2d.pixel-perfect": "4.0.1",
     "com.unity.2d.psdimporter": "4.1.2",
@@ -11,6 +12,7 @@
     "com.unity.ide.visualstudio": "2.0.14",
     "com.unity.ide.vscode": "1.2.4",
     "com.unity.mathematics": "1.2.1",
+    "com.unity.probuilder": "4.5.2",
     "com.unity.settings-manager": "1.0.3",
     "com.unity.test-framework": "1.1.29",
     "com.unity.testtools.codecoverage": "1.0.0",
@@ -56,5 +58,14 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "Vive",
+      "url": "https://npm-registry.vive.com/",
+      "scopes": [
+        "com.htc.upm"
+      ]
+    }
+  ]
 }

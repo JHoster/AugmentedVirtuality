@@ -34,6 +34,10 @@ public class VirtualObject : MonoBehaviour
   private Vector3 BL; //Bottom left
   private Vector3 BLW; //Bottom left in world space
   //public Vector3 BR; //Bottom right
+  public bool ray2World;
+  public float chairDistance;
+  public Vector3 chair3DPos;
+  public float chairHeight;
   //Rotation
   private Vector3 view;
   private Vector3 side;
@@ -71,9 +75,11 @@ public class VirtualObject : MonoBehaviour
   private float height2D;
   public float extraWidth = 1;
   public float extraHeight = 1;
+  public bool fadeMask;
+  private int maskSoftnessOrgX;
+  private int maskSoftnessOrgY;
   public float width2World;
   public float height2World;
-  public float scaleFac;
 
   // Update is called once per frame
   void Update()
@@ -89,7 +95,11 @@ public class VirtualObject : MonoBehaviour
     if (MBRA != null && body == null)
       body = MBRA.transform.parent.parent.parent.gameObject;
     if (body != null && mask == null)
+    {
       mask = body.GetComponent<RectMask2D>();
+      maskSoftnessOrgX = mask.softness.x;
+      maskSoftnessOrgY = mask.softness.y;
+    }
 
     if (CP == null && GameObject.Find("Container Panel")) //Disable UI images and make camImage transparent, so that Virtual Object can be seen
     {
@@ -109,17 +119,35 @@ public class VirtualObject : MonoBehaviour
         camImage.enabled = true;
         if (camMask)
         {
-          body.GetComponent<RectMask2D>().enabled = true;
-          if(!MBRA.gameObject.activeInHierarchy)
-            camImage.enabled = false;
+          mask.enabled = true;
+          if (!MBRA.gameObject.activeInHierarchy)
+          {
+            if (fadeMask)
+            {
+              float softX = Mathf.Lerp(mask.softness.x, 100000, Time.deltaTime / 10);
+              float softY = Mathf.Lerp(mask.softness.y, 100000, Time.deltaTime / 10);
+              mask.softness = new Vector2Int((int)softX, (int)softY);
+            }
+            else
+              camImage.enabled = false;
+          }
+          else
+          {
+            if (fadeMask)
+            {
+              float softX = Mathf.Lerp(mask.softness.x, maskSoftnessOrgX, Time.deltaTime * 10);
+              float softY = Mathf.Lerp(mask.softness.y, maskSoftnessOrgY, Time.deltaTime * 20);
+              mask.softness = new Vector2Int((int)softX, (int)softY);
+            }
+          }
         }
         else
-          body.GetComponent<RectMask2D>().enabled = false;
+          mask.enabled = false;
       }
       else
       {
         camImage.enabled = false;
-        body.GetComponent<RectMask2D>().enabled = false;
+        mask.enabled = false;
       }
     }
 
@@ -177,7 +205,7 @@ public class VirtualObject : MonoBehaviour
         //mask.padding = new Vector4(TL2D.x, 0, screenRect.width - (TL2D.x + boundingBox2D.width), TL2D.y);
         if (mask)
         {
-          body.GetComponent<RectMask2D>().enabled = true;
+          mask.enabled = true;
           float left = resWidth * positionVP.x - width2D / 2;// screenRect.width - (screenRect.width - (Position.x));
           float bottom = resHeight * positionVP.y - height2D / 2;//screenRect.height - (TL2D.y + height2D + extra);
           float right = resWidth * (1 - positionVP.x) - width2D / 2;//screenRect.width - (Position.x + width2D / 2);// screenRect.width - (Position.x + width2D / 2);
@@ -205,6 +233,29 @@ public class VirtualObject : MonoBehaviour
           }
     }
 
+    if (ray2World && cam.transform.position.y >= positionCenter.y)
+    {
+      //chairDistance gets negative when camera is lower than chairHeight/2!
+      Vector3 dir = positionCenter - cam.transform.position;//TA.position - cam.transform.position;
+      Ray ray = new Ray(cam.transform.position, dir);
+      Plane chairPlane = new Plane(Vector3.up, new Vector3(0, chairHeight / 2, 0));
+      //Debug.DrawLine(cam.transform.position, TA.position, Color.white);
+      //Debug.DrawLine(cam.transform.position, cam.ScreenToWorldPoint(new Vector3(positionScreen.x, positionScreen.y, zDistance)), Color.white);
+      //Debug.DrawLine(cam.transform.position, cam.ScreenToWorldPoint(new Vector3(positionScreen.x, positionScreen.y, zDistance), Camera.MonoOrStereoscopicEye.Right), Color.white);
+      if (chairPlane.Raycast(ray, out chairDistance))
+      {
+        chair3DPos = ray.GetPoint(chairDistance);
+        Debug.DrawLine(cam.transform.position, chair3DPos, Color.red);
+        Vector3 camGrounded = new Vector3(cam.transform.position.x, chairHeight / 2, cam.transform.position.z);
+        //Vector3 dirGrounded = chairDistance - camGrounded;
+        //Ray rayGrounded = new Ray(camGrounded, dirGrounded);
+        Debug.DrawLine(camGrounded, chair3DPos, Color.blue);
+        CP.transform.parent.gameObject.GetComponent<Canvas>().planeDistance = Vector3.Distance(camGrounded, chair3DPos);
+      }
+    }
+    else
+      CP.transform.parent.gameObject.GetComponent<Canvas>().planeDistance = 1;
+
     if (PLA && PLA.gameObject.activeInHierarchy && TA && TA.gameObject.activeInHierarchy)
     {
       //Position:
@@ -212,6 +263,7 @@ public class VirtualObject : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, TA.position, Time.deltaTime * smoothFactor);
       else
         transform.position = TA.position;
+
       //Scale:
       SePA = PLA.transform.GetChild(1).gameObject;
       TPA = PLA.transform.GetChild(2).gameObject;
@@ -244,8 +296,8 @@ public class VirtualObject : MonoBehaviour
         Vector3 view = zAxisDir - transform.position;
         Vector3 up = -(yAxisDir - transform.position);
         transform.rotation = Quaternion.LookRotation(view, up);
-        Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, transform.position + up, 0.5f));
-        Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, zAxisDir, 0.5f));
+        //Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, transform.position + up, 0.5f));
+        //Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, zAxisDir, 0.5f));
         //Debug.DrawLine(SiPA.transform.position, Vector3.Lerp(SiPA.transform.position, FPA.transform.position, 0.5f));
         //Debug.DrawLine(transform.position, Vector3.Lerp(transform.position, zAxisDir, 0.5f));
         //Vector3 TFPA = 1 / 2 * (TPA.transform.position - FPA.transform.position); //Vector pointing to middle between Third and Fourth PA
@@ -255,11 +307,11 @@ public class VirtualObject : MonoBehaviour
       else
       {
         //Rotation with TA:
-        xArrow = TA.transform.GetChild(0).GetChild(0);
+        //xArrow = TA.transform.GetChild(0).GetChild(0);
         yArrow = TA.transform.GetChild(1).GetChild(0);
         zArrow = TA.transform.GetChild(2).GetChild(0);
         view = zArrow.transform.position - TA.position;
-        side = xArrow.transform.position - TA.position;
+        //side = xArrow.transform.position - TA.position;
         up = yArrow.transform.position - TA.position;
         if (noXrot) //works good if cam view is parallel to ground
         {
@@ -326,31 +378,32 @@ public class VirtualObject : MonoBehaviour
       else
         transform.position = positionCenter;
 
-      if(MBRA != null && MBRA.gameObject.activeInHierarchy && MBRA.transform.childCount > 0)
-      {
-        ////LR.GetPosition 0 = BL, 1 = TL, 2 = TR, 3 = BR
-        ////Debug.Log(LR.GetPosition(2));
-        //////Debug.Log(cam.ScreenToViewportPoint(LR.GetPosition(2)));
-        ////Debug.LogWarning(cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(2).x, LR.GetPosition(2).y, 1)));
-        //Vector3 BLW = cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(0).x, LR.GetPosition(0).y, 1));
-        //Vector3 TLW = cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(1).x, LR.GetPosition(1).y, 1));
-        //Vector3 TRW = cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(2).x, LR.GetPosition(2).y, 1));
-        //Debug.DrawLine(TRW, TLW, Color.red);
-        //Debug.DrawLine(TLW, BLW, Color.blue);
-        //width2World = Mathf.Abs(TRW.x - TLW.x);
-        ////Debug.Log(width2D);
-        //height2World = Mathf.Abs(TLW.y - BLW.y);
+      //Scaling with 2D BB:
+      //if (MBRA != null && MBRA.gameObject.activeInHierarchy && MBRA.transform.childCount > 0)
+      //{
+      ////LR.GetPosition 0 = BL, 1 = TL, 2 = TR, 3 = BR
+      ////Debug.Log(LR.GetPosition(2));
+      //////Debug.Log(cam.ScreenToViewportPoint(LR.GetPosition(2)));
+      ////Debug.LogWarning(cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(2).x, LR.GetPosition(2).y, 1)));
+      //Vector3 BLW = cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(0).x, LR.GetPosition(0).y, 1));
+      //Vector3 TLW = cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(1).x, LR.GetPosition(1).y, 1));
+      //Vector3 TRW = cam.ScreenToWorldPoint(new Vector3(LR.GetPosition(2).x, LR.GetPosition(2).y, 1));
+      //Debug.DrawLine(TRW, TLW, Color.red);
+      //Debug.DrawLine(TLW, BLW, Color.blue);
+      //width2World = Mathf.Abs(TRW.x - TLW.x);
+      ////Debug.Log(width2D);
+      //height2World = Mathf.Abs(TLW.y - BLW.y);
 
-        //Vector3 movedPosX = new Vector3(positionScreen.x + width2D, positionScreen.y, positionScreen.z);
-        //Vector3 movedPosY = new Vector3(positionScreen.x, positionScreen.y + height2D, positionScreen.z);
-        //Debug.DrawLine(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosX), colour = Color.blue);
-        //Debug.DrawLine(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosY), colour = Color.red);
-        //float width2World = Vector3.Distance(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosX));
-        //float height2World = Vector3.Distance(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosY));
-        //transform.localScale = new Vector3(width2World, height2World, 1);
-      }
+      //Vector3 movedPosX = new Vector3(positionScreen.x + width2D, positionScreen.y, positionScreen.z);
+      //Vector3 movedPosY = new Vector3(positionScreen.x, positionScreen.y + height2D, positionScreen.z);
+      //Debug.DrawLine(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosX), colour = Color.blue);
+      //Debug.DrawLine(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosY), colour = Color.red);
+      //float width2World = Vector3.Distance(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosX));
+      //float height2World = Vector3.Distance(cam.ScreenToWorldPoint(positionScreen), cam.ScreenToWorldPoint(movedPosY));
+      //transform.localScale = new Vector3(width2World, height2World, 1);
+      //}
 
-      // 2D Bounding Box position and scale already done in the beginning. This was the old approach:
+      // 2D Bounding Box position already done above. This was the old approach:
       //  //Debug.Log(MBRA.GetChild(0).GetComponent<LineRenderer>().GetPosition(0));
       //  BL = MBRA.GetChild(0).GetComponent<LineRenderer>().GetPosition(0);
       //  BLW = Camera.main.ScreenToWorldPoint(new Vector3(2 * BL.x, transform.TransformPoint(MBRA.transform.position).y + 2 * BL.y, transform.TransformPoint(MBRA.transform.position).z));

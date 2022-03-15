@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Global Resource
+  - MiniWorldCamera
+  - ShowInMiniWorld
+  - VRPlayer
   layers:
   - Default
   - TransparentFX
@@ -37,7 +40,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - HMDOnly
   m_SortingLayers:
   - name: Default
     uniqueID: 0

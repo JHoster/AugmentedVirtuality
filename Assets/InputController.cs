@@ -36,7 +36,7 @@ public class InputController : MonoBehaviour
     if (Input.GetKeyDown(KeyCode.Alpha9))
       active.GetComponent<VirtualObject>().disabledAnnotation = !active.GetComponent<VirtualObject>().disabledAnnotation;
     if (Input.GetKeyDown(KeyCode.Alpha0))
-      inactive =  !inactive;
+      inactive = !inactive;
     if(inactive)
     {
       active.SetActive(false);
