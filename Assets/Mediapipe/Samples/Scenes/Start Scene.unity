@@ -4819,7 +4819,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &542027323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6537,13 +6537,14 @@ GameObject:
   - component: {fileID: 805128652}
   - component: {fileID: 805128651}
   - component: {fileID: 805128654}
+  - component: {fileID: 805128655}
   m_Layer: 0
   m_Name: Image Source
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &805128650
 Transform:
   m_ObjectHideFlags: 0
@@ -6632,6 +6633,42 @@ MonoBehaviour:
   _preferableDefaultWidth: 1280
   _defaultAvailableResolutions: []
   _webCamTexture: {fileID: 0}
+--- !u!114 &805128655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 805128649}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e9689712fbfbf4ebc68f587417cc9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wct: {fileID: 0}
+  _SavePath: C:/hmdPics/
+  hmd: {fileID: 0}
+  transformMatrix:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
+  fileName: transforms
+  repeatRate: 0.1
+  offset: {x: 0.5, y: 0.5, z: 0.5}
+  scale: 2
 --- !u!1 &814895788
 GameObject:
   m_ObjectHideFlags: 0
@@ -7243,7 +7280,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &888314176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7277,6 +7314,61 @@ Transform:
   - {fileID: 1045218744}
   m_Father: {fileID: 0}
   m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &896872896
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 896872898}
+  - component: {fileID: 896872897}
+  m_Layer: 0
+  m_Name: ReadINGP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &896872897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896872896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2179308a164f184d92f553520cc5da5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _SavePath: C:\Users\User\Desktop\Master\MasterThesisProjects\instant-ngp\data\hmdPics\
+  fileName: transforms
+  content: 
+  file_paths: []
+  sharpness: []
+  transform_matrix: []
+  tm: []
+  tms: []
+  colmap: 1
+  prefab: {fileID: 3893176243392403615, guid: 7a961c5f308108c4f99e5299863f02a6, type: 3}
+  cams: []
+  camsSorted: []
+--- !u!4 &896872898
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896872896}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &923438846
 GameObject:
@@ -7916,6 +8008,13 @@ MonoBehaviour:
   fadeMask: 0
   width2World: 0
   height2World: 0
+  status: NoBB
+  average: 0
+  averageListCount: 100
+  transformPos: []
+  transformRot: []
+  transformScale: []
+  median: 0
 --- !u!65 &964276551
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8755,6 +8854,13 @@ MonoBehaviour:
   fadeMask: 1
   width2World: 0
   height2World: 0
+  status: NoBB
+  average: 0
+  averageListCount: 100
+  transformPos: []
+  transformRot: []
+  transformScale: []
+  median: 0
 --- !u!4 &1045218744
 Transform:
   m_ObjectHideFlags: 0
@@ -9055,7 +9161,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1135941248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12088,6 +12194,61 @@ MonoBehaviour:
   colour: {r: 0, g: 0, b: 0, a: 0}
   colourOrg: {r: 0, g: 0, b: 0, a: 0}
   children: []
+--- !u!1 &1612712599
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1612712601}
+  - component: {fileID: 1612712600}
+  m_Layer: 0
+  m_Name: ReadINGP (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1612712600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612712599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2179308a164f184d92f553520cc5da5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _SavePath: C:\Users\User\Desktop\Master\MasterThesisProjects\instant-ngp\data\hmdPics\
+  fileName: transformsVive
+  content: 
+  file_paths: []
+  sharpness: []
+  transform_matrix: []
+  tm: []
+  tms: []
+  colmap: 0
+  prefab: {fileID: 3893176243392403615, guid: 7a961c5f308108c4f99e5299863f02a6, type: 3}
+  cams: []
+  camsSorted: []
+--- !u!4 &1612712601
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612712599}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1628353925
 GameObject:
   m_ObjectHideFlags: 0
@@ -15474,6 +15635,13 @@ MonoBehaviour:
   fadeMask: 1
   width2World: 0
   height2World: 0
+  status: NoBB
+  average: 0
+  averageListCount: 100
+  transformPos: []
+  transformRot: []
+  transformScale: []
+  median: 0
 --- !u!1 &2060208973
 GameObject:
   m_ObjectHideFlags: 0

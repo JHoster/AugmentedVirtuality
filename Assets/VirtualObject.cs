@@ -80,6 +80,13 @@ public class VirtualObject : MonoBehaviour
   private int maskSoftnessOrgY;
   public float width2World;
   public float height2World;
+  public string status = "NoBB";
+  public bool average;
+  public int averageListCount = 100;
+  public List<Vector3> transformPos = new List<Vector3>();
+  public List<Vector3> transformRot = new List<Vector3>();
+  public List<Vector3> transformScale = new List<Vector3>();
+  public bool median;
 
   // Update is called once per frame
   void Update()
@@ -258,9 +265,20 @@ public class VirtualObject : MonoBehaviour
 
     if (PLA && PLA.gameObject.activeInHierarchy && TA && TA.gameObject.activeInHierarchy)
     {
+      status = "3DBB";
       //Position:
       if (smoothTransform)
         transform.position = Vector3.Lerp(transform.position, TA.position, Time.deltaTime * smoothFactor);
+      else if (average)
+      {
+        transformPos.Insert(0, TA.position);
+        if (transformPos.Count > averageListCount)
+          transformPos.RemoveAt(averageListCount);
+        if (median)
+          transform.position = CalcMedian(transformPos);
+        else //Mean
+          transform.position = CalcMean(transformPos);
+      }
       else
         transform.position = TA.position;
 
@@ -276,6 +294,16 @@ public class VirtualObject : MonoBehaviour
       width = Vector3.Distance(SePA.transform.position, SiPA.transform.position);
       if (smoothScaling)
         transform.localScale = Vector3.Slerp(transform.localScale, new Vector3(width, height, depth), Time.deltaTime * smoothFactor);
+      else if (average)
+      {
+        transformScale.Insert(0, new Vector3(width, height, depth));
+        if (transformScale.Count > averageListCount)
+          transformScale.RemoveAt(averageListCount);
+        if (median)
+          transform.localScale = CalcMedian(transformScale);
+        else //Mean
+          transform.localScale = CalcMean(transformScale);
+      }
       else
         transform.localScale = new Vector3(width, height, depth);
       //Old scaling approach:
@@ -325,9 +353,29 @@ public class VirtualObject : MonoBehaviour
           //transform.rotation = Quaternion.Euler(look.eulerAngles.x, 0, look.eulerAngles.z);
           //Debug.Log(lookZ.eulerAngles);
           if (noZrot)
-            transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, 0); //Only rotation around y-Axis
+          {
+            if (smoothRotation)
+              transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, lookZ.eulerAngles.y, 0), Time.deltaTime * smoothFactor);
+            else if (average)
+            {
+              transformRot.Insert(0, Quaternion.Euler(0, lookZ.eulerAngles.y, 0).eulerAngles);
+              if (transformRot.Count > averageListCount)
+                transformRot.RemoveAt(averageListCount);
+              if (median)
+                transform.rotation = Quaternion.Euler(CalcMedian(transformRot));
+              else //Mean
+                transform.rotation = Quaternion.Euler(CalcMean(transformRot));
+            }
+            else
+              transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, 0); //Only rotation around y-Axis
+          }
           else
-            transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, lookZ.eulerAngles.z); //Only rotation around y-Axis and z-Axis
+          {
+            if (smoothRotation)
+              transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, lookZ.eulerAngles.y, lookZ.eulerAngles.z), Time.deltaTime * smoothFactor);
+            else
+              transform.rotation = Quaternion.Euler(0, lookZ.eulerAngles.y, lookZ.eulerAngles.z); //Only rotation around y-Axis and z-Axis
+          }
           //transform.rotation = Quaternion.Euler(AngleY, lookZ.eulerAngles.y, lookZ.eulerAngles.z);
           //transform.LookAt(new Vector3(zArrow.transform.position.x,zArrow.transform.position.y, zArrow.transform.position.z));
           //Align x-Axis? //add angle between Object x-Axis and Bounding box x-Axis to rotation around y-Axis
@@ -373,6 +421,7 @@ public class VirtualObject : MonoBehaviour
     }
     else if (MBRA && MBRA.gameObject.activeInHierarchy) //Use 2D Bounding Box for positioning
     {
+      status = "2DBB";
       if (smoothTransform)
         transform.position = Vector3.Lerp(transform.position, positionCenter, Time.deltaTime * smoothFactor * 2);
       else
@@ -428,7 +477,43 @@ public class VirtualObject : MonoBehaviour
     }
     else if (fade && colour.a > fadeUntil)
     {
+      status = "NoBB";
       colour.a -= Time.deltaTime / timeToFade;
     }
+  }
+
+  private Vector3 CalcMedian(List<Vector3> list)
+  {
+    List<float> xs = new List<float>();
+    List<float> ys = new List<float>();
+    List<float> zs = new List<float>();
+
+    var i = list.GetEnumerator();
+    while (i.MoveNext())
+    {
+      xs.Add(i.Current.x);
+      ys.Add(i.Current.y);
+      zs.Add(i.Current.z);
+    }
+    xs.Sort();
+    ys.Sort();
+    zs.Sort();
+    Debug.Log(list.Count / 2);
+    Vector3 med = Vector3.zero;
+    if (list.Count % 2 == 0) //even
+      return new Vector3(xs[list.Count / 2] + xs[(list.Count / 2) + 1], ys[list.Count / 2] + ys[(list.Count / 2) + 1], zs[list.Count / 2] + zs[(list.Count / 2) + 1]);
+    else
+      return new Vector3(xs[list.Count / 2], ys[list.Count / 2], zs[list.Count / 2]);
+  }
+
+  private Vector3 CalcMean(List<Vector3> list)
+  {
+    Vector3 transformAverage = Vector3.zero;
+    var i = list.GetEnumerator();
+    while (i.MoveNext())
+    {
+      transformAverage += i.Current;
+    }
+    return transformAverage /= list.Count;
   }
 }
