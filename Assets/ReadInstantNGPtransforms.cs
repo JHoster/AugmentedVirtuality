@@ -11,16 +11,18 @@ public class ReadInstantNGPtransforms : MonoBehaviour
   private StreamReader _reader;
   public string content;
 
+  public Vector3 offset = Vector3.zero;
+  public float scale;
 
   public List<string> file_paths = new List<string>();
   public List<float> sharpness = new List<float>();
   public List<float> transform_matrix = new List<float>();
   public List<float> tm = new List<float>();
   public List<Matrix4x4> tms = new List<Matrix4x4>();
-  public bool colmap; //colmap uses inverse order
+  public bool colmapOffsetAndScale;
+  public bool colmapOrder; //colmap uses inverse order
   public GameObject prefab;
   public List<GameObject> cams = new List<GameObject>();
-  public List<GameObject> camsSorted = new List<GameObject>();
 
   // Start is called before the first frame update
   void Start()
@@ -35,6 +37,15 @@ public class ReadInstantNGPtransforms : MonoBehaviour
     // Read the file and display it line by line.  
     foreach (string line in File.ReadLines(_SavePath + fileName))
     {
+      if (line.Contains("offset"))
+      {
+        string[] offs = line.Remove(line.Length - 2).Remove(0, 13).Split(',');
+        offset.z = float.Parse(offs[0]);
+        offset.x = float.Parse(offs[1]);
+        offset.y = float.Parse(offs[2]);
+      }
+      if (line.Contains("\"scale"))
+        scale = float.Parse(line.Remove(line.Length - 1).Remove(0, 10));
       if (line.Contains("file_path"))
         file_paths.Add(line.Remove(line.Length - 1).Remove(0, 18));
       if (line.Contains("sharpness"))
@@ -48,7 +59,7 @@ public class ReadInstantNGPtransforms : MonoBehaviour
       }
     }
 
-    int counter = 0;
+
     while (transform_matrix.Count > 0)
     {
       tm = transform_matrix.GetRange(0, 16);
@@ -56,17 +67,23 @@ public class ReadInstantNGPtransforms : MonoBehaviour
       //from zxyw to xyzw and -1 for z-Axis
       //Matrix4x4 m = new Matrix4x4(new Vector4(tm[4], tm[8], tm[0] * -1, tm[12]), new Vector4(tm[5], tm[9], tm[1] * -1, tm[13]), new Vector4(tm[6], tm[10], tm[2] * -1, tm[14]), new Vector4(tm[7], tm[11], tm[3] * -1, tm[15]));
       Matrix4x4 m = new Matrix4x4(new Vector4(tm[4], tm[8], tm[0], tm[12]), new Vector4(tm[5], tm[9], tm[1], tm[13]), new Vector4(tm[6], tm[10], tm[2], tm[14]), new Vector4(tm[7], tm[11], tm[3], tm[15]));
-      m[0, 2] *= -1;
-      m[1, 2] *= -1;
-      m[2, 2] *= -1;
-      m[3, 2] *= -1;
+      //m[0, 2] *= -1;
+      //m[1, 2] *= -1;
+      //m[2, 2] *= -1;
+      //m[3, 2] *= -1;
       tms.Add(m);
       GameObject pf = Instantiate(prefab, m.GetColumn(3), Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1)), transform);
       pf.transform.localScale = new Vector3(m.GetColumn(0).magnitude, m.GetColumn(1).magnitude, m.GetColumn(2).magnitude);
 
+      //mirror
+      pf.transform.position = new Vector3(-pf.transform.position.x, pf.transform.position.y, pf.transform.position.z);
+      pf.transform.eulerAngles = new Vector3(-pf.transform.eulerAngles.x, -pf.transform.localEulerAngles.y + 180, pf.transform.localEulerAngles.z);
 
-      pf.name = file_paths[counter].Remove(file_paths[counter].Length - 5).Remove(0, 11);
-      counter++;
+      pf.transform.RotateAround(Vector3.zero, Vector3.up, 90f);
+      pf.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //just for better visualization
+
+      pf.name = file_paths[0].Remove(file_paths[0].Length - 5).Remove(0, 11);
+      file_paths.RemoveAt(0);
       //if (colmap)
       cams.Add(pf);
       //pf.name = file_paths[0];
@@ -78,13 +95,32 @@ public class ReadInstantNGPtransforms : MonoBehaviour
       //file_paths.RemoveAt(0);
     }
 
-    if (colmap)
+    if (colmapOrder)
     {
-      camsSorted = cams.OrderBy(go => int.Parse(go.name)).ToList();
-      camsSorted.Reverse();
+      cams = cams.OrderBy(go => int.Parse(go.name)).ToList();
+      cams.Reverse();
+      int counter = 0;
+      foreach (GameObject cam in cams)
+      {
+        cam.transform.SetAsLastSibling();
+        cam.name = counter.ToString();
+        counter++;
+      }
+    }
+
+    if (colmapOffsetAndScale)
+    {
+      offset = new Vector3(0.5f, 0.5f, 0.5f);
+      scale = 0.33f;
+      transform.localPosition = offset;
+      transform.localScale = new Vector3(scale, scale, scale);
     }
     else
-      camsSorted = cams;
+    {
+      transform.localPosition = offset;
+      transform.localScale = new Vector3(scale, scale, scale);
+    }
+
 
     //Now it's possible to compare camsSorted Lists elementwise!
 
@@ -142,8 +178,8 @@ public class ReadInstantNGPtransforms : MonoBehaviour
   }
 
   // Update is called once per frame
-  void Update()
-  {
+  //void Update()
+  //{
 
-  }
+  //}
 }

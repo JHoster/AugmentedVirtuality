@@ -17,6 +17,8 @@ public class TakePics : MonoBehaviour
   public float repeatRate;
   public Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
   public float scale = 2f;
+  public bool camOffset;
+  public GameObject prefab;
 
   void Start()
   {
@@ -50,14 +52,34 @@ public class TakePics : MonoBehaviour
     InvokeRepeating(nameof(TakePic), 3f, repeatRate); //Invokes the method methodName in time seconds, then repeatedly every repeatRate seconds.
   }
 
-  // Update is called once per frame
+  //Update is called once per frame
   void Update()
   {
     if (hmd == null && GameObject.Find("Camera"))
       hmd = GameObject.Find("Camera");
+    //if (hmd && Input.GetKeyDown(KeyCode.P))
+    //  TakePic();
+  }
+
+  private void TakePic()
+  {
+    //Debug.Log("TakePic started");
     if (hmd)
     {
+      if (camOffset)
+        hmd.transform.position = hmd.transform.position + (hmd.transform.forward * 0.1f);
+      //Debug.Log("offset applied");
+
+      //mirror
+      hmd.transform.position = new Vector3(-hmd.transform.position.x, hmd.transform.position.y, hmd.transform.position.z);
+      hmd.transform.eulerAngles = new Vector3(-hmd.transform.eulerAngles.x, -hmd.transform.localEulerAngles.y + 180, hmd.transform.localEulerAngles.z);
+      //Instantiate(prefab, hmd.transform.position, hmd.transform.rotation, transform);
+
+      //Rotate 90° around y
+      hmd.transform.RotateAround(Vector3.zero, Vector3.up, 90f);
+
       transformMatrix = hmd.transform.localToWorldMatrix;
+
       //     x     y     z
       //x ([0,0],[0,1],[0,2],[0,3])
       //y ([1,0],[1,1],[1,2],[1,3])
@@ -72,17 +94,12 @@ public class TakePics : MonoBehaviour
 
       //Change z-axis sign (Unity -> OpenGL)
       //transformMatrix[a, b], a refers to the row index, while b refers to the column index.
-      transformMatrix[0, 2] *= -1;
-      transformMatrix[1, 2] *= -1;
-      transformMatrix[2, 2] *= -1;
-      transformMatrix[3, 2] *= -1;
+      //transformMatrix[0, 2] *= -1;
+      //transformMatrix[1, 2] *= -1;
+      //transformMatrix[2, 2] *= -1;
+      //transformMatrix[3, 2] *= -1;
     }
-    //if (hmd && Input.GetKeyDown(KeyCode.P))
-    //  TakePic();
-  }
 
-  private void TakePic()
-  {
     if (_CaptureCounter > 0)
       _writer.WriteLine("    },"); //last frame with comma
     _writer.WriteLine("    {");
@@ -142,7 +159,7 @@ public class TakePics : MonoBehaviour
     _writer.WriteLine("      ]");
 
     //_writer.WriteLine(hmdPos.ToString() + hmdRot.ToString() + hmdScale.ToString());
-
+    //Debug.Log("transforms written, picture gets taken");
     wct = GetComponent<CamTextSource>()._webCamTexture;
     Texture2D snap = new Texture2D(wct.width, wct.height);
     snap.SetPixels(wct.GetPixels());
