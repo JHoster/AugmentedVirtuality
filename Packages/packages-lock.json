@@ -13,6 +13,13 @@
       "dependencies": {},
       "url": "https://npm-registry.vive.com"
     },
+    "com.mines-paristech.colibri-vr": {
+      "version": "https://github.com/CAOR-MINES-ParisTech/colibri-vr-unity-package.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ab11dab814461154185a1e868cc5496cc35d6086"
+    },
     "com.unity.2d.animation": {
       "version": "5.0.9",
       "depth": 0,

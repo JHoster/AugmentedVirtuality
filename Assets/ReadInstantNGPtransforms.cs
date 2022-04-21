@@ -8,10 +8,10 @@ public class ReadInstantNGPtransforms : MonoBehaviour
 {
   public string _SavePath = "C:/hmdPics/";
   public string fileName = "transforms";
-  private StreamReader _reader;
-  public string content;
+  //private StreamReader _reader;
+  //public string content;
 
-  public Vector3 offset = Vector3.zero;
+  public Vector3 offset;
   public float scale;
 
   public List<string> file_paths = new List<string>();
@@ -23,12 +23,43 @@ public class ReadInstantNGPtransforms : MonoBehaviour
   public bool colmapOrder; //colmap uses inverse order
   public GameObject prefab;
   public List<GameObject> cams = new List<GameObject>();
+  public bool centerByBounds;
+  public bool centerToUB;
+  public Vector3 centerPoint;
+  public Vector3 offsetToUnitBox;
 
-  // Start is called before the first frame update
-  void Start()
+
+  public void Start()
   {
+    ReadINGP();
+  }
+
+  public void Reset()
+  {
+    while (transform.childCount > 0)
+      foreach (Transform child in transform)
+        DestroyImmediate(child.gameObject);
+    offset = Vector3.zero;
+    centerPoint = Vector3.zero;
+    offsetToUnitBox = Vector3.zero;
+    scale = 0;
+    file_paths.Clear();
+    sharpness.Clear();
+    transform_matrix.Clear();
+    tm.Clear();
+    tms.Clear();
+    cams.Clear();
+    transform.localScale = Vector3.one;
+    transform.position = Vector3.zero;
+  }
+
+  public void ReadINGP()
+  {
+    Reset();
+
     System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US"); //comma as decimal symbol causes problems
-    fileName += ".json"; //".txt";
+    if(!fileName.EndsWith(".json"))
+      fileName += ".json"; //".txt";
     if (_SavePath.Contains("/"))
       _SavePath = _SavePath.Replace("/", "\\");
     if (!File.Exists(_SavePath + fileName))
@@ -79,7 +110,7 @@ public class ReadInstantNGPtransforms : MonoBehaviour
       pf.transform.position = new Vector3(-pf.transform.position.x, pf.transform.position.y, pf.transform.position.z);
       pf.transform.eulerAngles = new Vector3(-pf.transform.eulerAngles.x, -pf.transform.localEulerAngles.y + 180, pf.transform.localEulerAngles.z);
 
-      pf.transform.RotateAround(Vector3.zero, Vector3.up, 90f);
+      //pf.transform.RotateAround(Vector3.zero, Vector3.up, 90f);
       pf.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f); //just for better visualization
 
       pf.name = file_paths[0].Remove(file_paths[0].Length - 5).Remove(0, 11);
@@ -98,14 +129,25 @@ public class ReadInstantNGPtransforms : MonoBehaviour
     if (colmapOrder)
     {
       cams = cams.OrderBy(go => int.Parse(go.name)).ToList();
-      cams.Reverse();
-      int counter = 0;
+      //cams.Reverse();
+      //int counter = 0;
+      //foreach (GameObject cam in cams)
+      //{
+      //  cam.transform.SetAsLastSibling();
+      //  cam.name = counter.ToString();
+      //  counter++;
+      //}
+    }
+
+    if (centerByBounds)
+    {
+      var bounds = new Bounds(cams[0].transform.position, Vector3.zero);
       foreach (GameObject cam in cams)
       {
-        cam.transform.SetAsLastSibling();
-        cam.name = counter.ToString();
-        counter++;
+        bounds.Encapsulate(cam.transform.position);
       }
+      centerPoint = bounds.center;
+      offsetToUnitBox = new Vector3(0.5f, 0.5f, 0.5f) - centerPoint;
     }
 
     if (colmapOffsetAndScale)
@@ -117,10 +159,12 @@ public class ReadInstantNGPtransforms : MonoBehaviour
     }
     else
     {
-      transform.localPosition = offset;
+      if (centerToUB)
+        transform.localPosition = offsetToUnitBox;
+      else
+        transform.localPosition = offset;
       transform.localScale = new Vector3(scale, scale, scale);
     }
-
 
     //Now it's possible to compare camsSorted Lists elementwise!
 
