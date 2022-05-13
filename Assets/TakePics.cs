@@ -17,7 +17,7 @@ public class TakePics : MonoBehaviour
   private StreamWriter _writer;
   public float repeatRate;
   public Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
-  public float scale = 2f;
+  public float scale;
   public bool camOffset;
   private Transform hmdT;
   public GameObject prefab;
@@ -27,6 +27,9 @@ public class TakePics : MonoBehaviour
   public bool changeUnitBox;
   public GameObject UnitBox;
   public Vector3 center; //similar to offset but calculated while taking pics
+  public bool useObjectronCenter;
+  public GameObject VO;
+  public float chairHeight;
 
   void Start()
   {
@@ -86,22 +89,22 @@ public class TakePics : MonoBehaviour
       Debug.Log("Took " + camPos.Count + " pictures.");
 
       UnitBox.transform.position = center / camPos.Count;
-    }
+    //}
 
-    //Show and change Unit Bounding Box (height)
-    if (closed && changeUnitBox)
-    {
-      UnitBox.SetActive(true);
-      if (Input.GetKey(KeyCode.UpArrow))
-        UnitBox.transform.position += new Vector3(0, Time.deltaTime, 0);
-      if (Input.GetKey(KeyCode.DownArrow))
-        UnitBox.transform.position += new Vector3(0, -Time.deltaTime, 0);
-    }
-    else
-      UnitBox.SetActive(false);
+    ////Show and change Unit Bounding Box (height)
+    //if (closed && changeUnitBox)
+    //{
+    //  UnitBox.SetActive(true);
+    //  if (Input.GetKey(KeyCode.UpArrow))
+    //    UnitBox.transform.position += new Vector3(0, Time.deltaTime, 0);
+    //  if (Input.GetKey(KeyCode.DownArrow))
+    //    UnitBox.transform.position += new Vector3(0, -Time.deltaTime, 0);
+    //}
+    //else
+    //  UnitBox.SetActive(false);
 
-    if (closed && Input.GetKeyDown(KeyCode.Return))
-    {
+    //if (closed && Input.GetKeyDown(KeyCode.Return))
+    //{
       offset = Vector3.zero;
       foreach (Vector3 c in camPos)
       {
@@ -109,18 +112,28 @@ public class TakePics : MonoBehaviour
       }
       offset /= camPos.Count;
       center = UnitBox.transform.position;
-      Debug.Log(offset);
-      Debug.Log(center);
-      Debug.Log(offset == center);
+      Debug.Log("offsetOrg " + offset.ToString("F4"));
+      //Debug.Log("center " + center.ToString("F4"));
+      //Debug.Log(offset == center);
       if (changeUnitBox)
         offset = center;
+      if (useObjectronCenter && VO) //Needs VO with Ray2World
+        offset = VO.transform.position;
+      if (chairHeight != 0)
+      {
+        offset = new Vector3(offset.x, offset.y - (chairHeight / 2), offset.z); //offset.y = hmdHeight, but chair is smaller
+        //scale = 1 - chairHeight;
+      }
+      Debug.Log("new offset: " + offset.ToString("F4"));
+      if (VO)
+        Debug.Log("VOPos " + VO.transform.position);
       offset = new Vector3(0.5f, 0.5f, 0.5f) - offset;
-      Debug.Log("final offset: " + offset);
-
+      Debug.Log("final offset: " + offset.ToString("F4"));
       if (record)
       {
         //Correct offset:
         lineChanger("  \"offset\": [" + offset.x + "," + offset.z + "," + offset.y + "],", _SavePath + fileName, 16);
+
         Debug.Log("Finished");
       }
     }
