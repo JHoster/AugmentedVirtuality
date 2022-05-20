@@ -11,8 +11,18 @@ namespace Mediapipe
 {
   public class NormalizedRectVectorPacket : Packet<List<NormalizedRect>>
   {
-    public NormalizedRectVectorPacket() : base() { }
+    /// <summary>
+    ///   Creates an empty <see cref="NormalizedRectVectorPacket" /> instance.
+    /// </summary>
+    public NormalizedRectVectorPacket() : base(true) { }
+
+    [UnityEngine.Scripting.Preserve]
     public NormalizedRectVectorPacket(IntPtr ptr, bool isOwner = true) : base(ptr, isOwner) { }
+
+    public NormalizedRectVectorPacket At(Timestamp timestamp)
+    {
+      return At<NormalizedRectVectorPacket>(timestamp);
+    }
 
     public override List<NormalizedRect> Get()
     {

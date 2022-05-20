@@ -1,46 +1,139 @@
-# AugmentedVirtuality
-Digital Representations of Real World Objects in VR Applications
+# MediaPipe Unity Plugin
 
-### Table of contents 
-- [1. Idea](#1-idea)
-- [2. Methodology](#2-methodology)
-  * [Object detection](#object-detection)
-  * [Implementation](#implementation)
-- [3. Virtual Object](#3-virtual-object)
-- [4. Results](#4-results)
-- [5. Prospects](#5-prospects)
+This is a Unity (2020.3.30f1) [Native Plugin](https://docs.unity3d.com/Manual/NativePlugins.html) to use [MediaPipe](https://github.com/google/mediapipe) (0.8.9).
 
-## 1. Idea 
-While wearing a VR headset, one is blind to the real surroundings and may bump into something or have difficulty finding and interacting with real-world objects such as chairs or cups. Taking off the VR headset is a nuisance and destroys immersion.  
-The idea of this work is to enable VR users to interact with real-world objects by putting similar virtual object in their place. To do this, the real-world object must first be detected by a computer vision model and then the virtual representation has to be placed, rotated and scaled so that it resembles the real-world object as much as possible.  
+The goal of this project is to port the MediaPipe API (C++) _one by one_ to C# so that it can be called from Unity.\
+This approach may sacrifice performance when you need to call multiple APIs in a loop, but it gives you the flexibility to use MediaPipe instead.
 
-## 2. Methodology 
-### Object detection 
-To detect the real-world objects Google's [MediaPipe Objectron](https://google.github.io/mediapipe/solutions/objectron.html) will be used, which detects
-objects in 2D images, estimates their poses and predicts 3D bounding boxes around the objects in real-time.  
-![Example](https://google.github.io/mediapipe/images/mobile/objectron_chair_android_gpu.gif)
-![Example2](https://google.github.io/mediapipe/images/mobile/objectron_cup_android_gpu.gif)  
-The Objectron dataset consists of over 14k annotated video clips of common objects (chairs, cups, cameras and shoes), collected from a geo-diverse sample (covering ten countries across five continents). The model trained on this dataset creates 3D bounding boxes, which describe the object's position, orientation and dimensions. Source: [Objectron Paper](https://arxiv.org/abs/2012.09988)  
+With this plugin, you can
 
-### Implementation 
-As a virtual reality game engine [Unity](https://unity.com/unity/features/vr) will be used. To implement MediaPipe in Unity the [MediaPipe Unity Plugin](https://github.com/homuler/MediapipeUnityPlugin) ports the MediaPipe API (C++) one by one to C# so that it can be called from Unity.  
+- Write MediaPipe code in C#.
+- Run MediaPipe's official solution on Unity.
+- Run your custom `Calculator` and `CalculatorGraph` on Unity.
+  - :warning: Depending on the type of input/output, you may need to write C++ code.
 
-## 3. Virtual Object 
-The [virtual object script](https://github.com/JHoster/AugmentedVirtuality/blob/main/Assets/VirtualObject.cs) positions, rotates and scales any virtual representation of the real-world object.  
-The positioning, rotation and scaling is done over time rather than instantly to make the virtual object appear less shaky:  
-![ChairSmooth](https://github.com/JHoster/AugmentedVirtuality/blob/main/gifs/ChairSmooth.gif)  
-If no 3D bounding box is detected, the virtual object fades away to prevent the user from assuming that a real object is present when it is not:  
-![ChairFade](https://github.com/JHoster/AugmentedVirtuality/blob/main/gifs/ChairFade.gif)  
+## :smile_cat: Hello World!
 
-## 4. Results 
-[Download the prototype version](https://thetex.itch.io/avp?secret=uT9gOfXgQma7klqFiqPbqWZmUu8)  
-The [input controller script](https://github.com/JHoster/AugmentedVirtuality/blob/main/Assets/InputController.cs) lets users switch between different virtual objects, toggle the fade and smooth functions and disable the bounding box annotation or the virtual object.  
-Example of positioning, rotating and scaling a virtual chair to match the real one:   
-![ChairRotate](https://github.com/JHoster/AugmentedVirtuality/blob/main/gifs/ChairRotate.gif)  
+Here is a Hello World! example.\
+Compare it with [the official code](https://github.com/google/mediapipe/blob/cf101e62a9d49a51be76836b2b8e5ba5c06b5da0/mediapipe/examples/desktop/hello_world/hello_world.cc)!
 
-Any kind of virtual object can be used! Virtual object can be specified in advance to match the VR scene.  
-![ChairDifferentVOs](https://github.com/JHoster/AugmentedVirtuality/blob/main/gifs/ChairDifferentVOs.gif)
+```cs
+using Mediapipe;
+using UnityEngine;
 
-## 5. Prospects 
-The prototype needs to be tested with a VR headset, and further optimisation is expected.  
-An automatic selection, or even an automatic creation (halluzination) of virtual objects, that fit the virtual scene, could be researched with a machine learning model.
+public sealed class HelloWorld : MonoBehaviour
+{
+    private const string _ConfigText = @"
+input_stream: ""in""
+output_stream: ""out""
+node {
+  calculator: ""PassThroughCalculator""
+  input_stream: ""in""
+  output_stream: ""out1""
+}
+node {
+  calculator: ""PassThroughCalculator""
+  input_stream: ""out1""
+  output_stream: ""out""
+}
+";
+
+    private void Start()
+    {
+        var graph = new CalculatorGraph(_ConfigText);
+        var poller = graph.AddOutputStreamPoller<string>("out").Value();
+        graph.StartRun().AssertOk();
+
+        for (var i = 0; i < 10; i++)
+        {
+            graph.AddPacketToInputStream("in", new StringPacket("Hello World!", new Timestamp(i))).AssertOk();
+        }
+
+        graph.CloseInputStream("in").AssertOk();
+        var packet = new StringPacket();
+
+        while (poller.Next(packet))
+        {
+            Debug.Log(packet.Get());
+        }
+        graph.WaitUntilDone().AssertOk();
+    }
+}
+```
+
+## :hammer_and_wrench: Installation
+
+This repository does not contain required libraries (e.g. `libmediapipe_c.so`, `Google.Protobuf.dll`, etc), so you **need to build them** first.\
+For step-by-step guide, please refer to the [Installation Guide](https://github.com/homuler/MediaPipeUnityPlugin/wiki/Installation-Guide) in Wiki.
+
+> :warning: libraries that can be built differ depending on your environment.
+
+### Supported Platforms
+
+> :warning: GPU mode is not supported on macOS and Windows.
+
+|                            |       Editor       |   Linux (x86_64)   |   macOS (x86_64)   |   macOS (ARM64)    |  Windows (x86_64)  |      Android       |        iOS         | WebGL |
+| :------------------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :---: |
+|     Linux (AMD64) [^1]     | :heavy_check_mark: | :heavy_check_mark: |                    |                    |                    | :heavy_check_mark: |                    |       |
+|         Intel Mac          | :heavy_check_mark: |                    | :heavy_check_mark: |                    |                    | :heavy_check_mark: | :heavy_check_mark: |       |
+|        M1 Mac [^2]         | :heavy_check_mark: |                    |                    | :heavy_check_mark: |                    | :heavy_check_mark: | :heavy_check_mark: |       |
+| Windows 10/11 (AMD64) [^3] | :heavy_check_mark: |                    |                    |                    | :heavy_check_mark: | :heavy_check_mark: |                    |       |
+
+[^1]: Tested on Arch Linux.
+[^2]: Experimental, because MediaPipe does not support M1 Mac.
+[^3]: Running MediaPipe on Windows is [experimental](https://google.github.io/mediapipe/getting_started/install.html#installing-on-windows).
+
+## :plate_with_cutlery: Try sample app
+
+### Example Solutions
+
+Here is a list of [solutions](https://google.github.io/mediapipe/solutions/solutions.html) that you can try in the sample app.
+
+> :bell: The graphs you can run are not limited to the ones in this list.
+
+|                         |      Android       |        iOS         |    Linux (GPU)     |    Linux (CPU)     |    macOS (CPU)     |   Windows (CPU)    | WebGL |
+| :---------------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | :----------------: | ----- |
+|     Face Detection      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|        Face Mesh        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|          Iris           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|          Hands          | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|          Pose           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|        Holistic         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|   Selfie Segmentation   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|    Hair Segmentation    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|    Object Detection     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|      Box Tracking       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+| Instant Motion Tracking | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|        Objectron        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |       |
+|          KNIFT          |                    |                    |                    |                    |                    |                    |       |
+
+### UnityEditor
+
+Select `Mediapipe/Samples/Scenes/Start Scene` and play.
+
+### Desktop
+
+If you've built native libraries for CPU (i.e. `--desktop cpu`), select `CPU` for inference mode from the Inspector Window.
+![preferable-inference-mode](https://user-images.githubusercontent.com/4690128/134795568-156f3d41-b46e-477f-a487-d04c99300c33.png)
+
+### Android, iOS
+
+Make sure that you select `GPU` for inference mode before building the app, because `CPU` inference mode is not supported currently.
+
+## :book: Wiki
+
+:construction: https://github.com/homuler/MediaPipeUnityPlugin/wiki
+
+## :scroll: LICENSE
+
+[MIT](https://github.com/homuler/MediaPipeUnityPlugin/blob/master/LICENSE)
+
+Note that some files are distributed under other licenses.
+
+- MediaPipe ([Apache Licence 2.0](https://github.com/google/mediapipe/blob/e6c19885c6d3c6f410c730952aeed2852790d306/LICENSE))
+- emscripten ([MIT](https://github.com/emscripten-core/emscripten/blob/7c873832e933e86855f5ef5f7c6438f0e457c94e/LICENSE))
+   - `third_party/mediapipe_emscripten_patch.diff` contains code copied from emscripten
+- FontAwesome ([LICENSE](https://github.com/FortAwesome/Font-Awesome/blob/7cbd7f9951be31f9d06b6ac97739a700320b9130/LICENSE.txt))
+   - Sample scenes use Font Awesome fonts
+
+See also [Third Party Notices.md](https://github.com/homuler/MediaPipeUnityPlugin/blob/master/Third%20Party%20Notices.md).

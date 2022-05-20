@@ -1,3 +1,31 @@
+diff --git a/mediapipe/BUILD b/mediapipe/BUILD
+index 1171ea6..5f1994d 100644
+--- a/mediapipe/BUILD
++++ b/mediapipe/BUILD
+@@ -74,6 +74,7 @@ alias(
+     name = "macos",
+     actual = select({
+         ":macos_i386": ":macos_i386",
++        ":macos_arm64": "macos_arm64",
+         ":macos_x86_64": ":macos_x86_64",
+         "//conditions:default": ":macos_i386",  # Arbitrarily chosen from above.
+     }),
+@@ -119,6 +120,15 @@ config_setting(
+     visibility = ["//visibility:public"],
+ )
+ 
++config_setting(
++    name = "macos_arm64",
++    values = {
++        "apple_platform_type": "macos",
++        "cpu": "darwin_arm64",
++    },
++    visibility = ["//visibility:public"],
++)
++
+ [
+     config_setting(
+         name = arch,
 diff --git a/mediapipe/calculators/tensor/BUILD b/mediapipe/calculators/tensor/BUILD
 index 72c2f51..79929e0 100644
 --- a/mediapipe/calculators/tensor/BUILD
@@ -257,18 +285,18 @@ index fb75eb3..0eee4ff 100644
          ":annotation_cc_proto",
          ":belief_decoder_config_cc_proto",
 diff --git a/mediapipe/util/tflite/tflite_gpu_runner.cc b/mediapipe/util/tflite/tflite_gpu_runner.cc
-index 5445f02..3f0eed7 100644
+index 14a12db..b01ff6d 100644
 --- a/mediapipe/util/tflite/tflite_gpu_runner.cc
 +++ b/mediapipe/util/tflite/tflite_gpu_runner.cc
-@@ -213,8 +213,10 @@ absl::Status TFLiteGPURunner::InitializeOpenCL(
-       cl::NewInferenceEnvironment(env_options, &cl_environment_, &properties));
+@@ -252,8 +252,10 @@ absl::Status TFLiteGPURunner::InitializeOpenCL(
    MP_RETURN_IF_ERROR(cl_environment_->NewInferenceBuilder(
-       cl_options, std::move(*graph_cl_), builder));
--#endif
+       cl_options, std::move(graph_cl), builder));
+ 
+-#endif  // __ANDROID__
    return absl::OkStatus();
 +#else
 +  return mediapipe::UnimplementedError("OpenCL is currently only supported on Android");
-+#endif
++#endif  // __ANDROID__
  }
  
- }  // namespace gpu
+ #ifdef __ANDROID__

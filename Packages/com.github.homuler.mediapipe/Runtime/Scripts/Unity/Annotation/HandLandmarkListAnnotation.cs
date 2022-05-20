@@ -9,6 +9,10 @@ using UnityEngine;
 
 namespace Mediapipe.Unity
 {
+#pragma warning disable IDE0065
+  using Color = UnityEngine.Color;
+#pragma warning restore IDE0065
+
   public sealed class HandLandmarkListAnnotation : HierarchicalAnnotation
   {
     [SerializeField] private PointListAnnotation _landmarkListAnnotation;
@@ -71,9 +75,7 @@ namespace Mediapipe.Unity
 
     private void Start()
     {
-      _landmarkListAnnotation.SetColor(_leftLandmarkColor); // assume it's left hand by default
       _landmarkListAnnotation.Fill(_LandmarkCount);
-
       _connectionListAnnotation.Fill(_connections, _landmarkListAnnotation);
     }
 

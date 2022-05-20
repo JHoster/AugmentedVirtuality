@@ -6,9 +6,17 @@
 
 #include "mediapipe_api/common.h"
 
-#ifndef _WIN32
+#ifndef MEDIAPIPE_DISABLE_SIGABRT_HANDLER
 thread_local struct sigaction mp_api::orig_act;
 thread_local sigjmp_buf mp_api::abrt_jbuf;
 
 void mp_api::sigabrt_handler(int sig) { siglongjmp(abrt_jbuf, 1); }
 #endif
+
+namespace mp_api {
+  FreeHGlobal* freeHGlobal;
+}
+
+void mp_api__SetFreeHGlobal(mp_api::FreeHGlobal* freeHGlobal) {
+  mp_api::freeHGlobal = freeHGlobal;
+}

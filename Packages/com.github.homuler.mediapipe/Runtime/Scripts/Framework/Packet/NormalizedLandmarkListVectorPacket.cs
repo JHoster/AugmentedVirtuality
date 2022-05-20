@@ -11,8 +11,18 @@ namespace Mediapipe
 {
   public class NormalizedLandmarkListVectorPacket : Packet<List<NormalizedLandmarkList>>
   {
-    public NormalizedLandmarkListVectorPacket() : base() { }
+    /// <summary>
+    ///   Creates an empty <see cref="NormalizedLandmarkListVectorPacket" /> instance.
+    /// </summary>
+    public NormalizedLandmarkListVectorPacket() : base(true) { }
+
+    [UnityEngine.Scripting.Preserve]
     public NormalizedLandmarkListVectorPacket(IntPtr ptr, bool isOwner = true) : base(ptr, isOwner) { }
+
+    public NormalizedLandmarkListVectorPacket At(Timestamp timestamp)
+    {
+      return At<NormalizedLandmarkListVectorPacket>(timestamp);
+    }
 
     public override List<NormalizedLandmarkList> Get()
     {

@@ -10,8 +10,12 @@ namespace Mediapipe
 {
   public class ImageFramePacket : Packet<ImageFrame>
   {
-    public ImageFramePacket() : base() { }
+    /// <summary>
+    ///   Creates an empty <see cref="ImageFramePacket" /> instance.
+    /// </summary>
+    public ImageFramePacket() : base(true) { }
 
+    [UnityEngine.Scripting.Preserve]
     public ImageFramePacket(IntPtr ptr, bool isOwner = true) : base(ptr, isOwner) { }
 
     public ImageFramePacket(ImageFrame imageFrame) : base()
@@ -29,6 +33,11 @@ namespace Mediapipe
       imageFrame.Dispose(); // respect move semantics
 
       this.ptr = ptr;
+    }
+
+    public ImageFramePacket At(Timestamp timestamp)
+    {
+      return At<ImageFramePacket>(timestamp);
     }
 
     public override ImageFrame Get()

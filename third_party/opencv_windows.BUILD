@@ -19,9 +19,9 @@ licenses(["notice"])  # BSD license
 
 exports_files(["LICENSE"])
 
-OPENCV_VERSION = "3410"  # 3.4.10
+OPENCV_VERSION = "3416"  # 3.4.16
 
-# The following build rule assumes that the executable "opencv-3.4.10-vc14_vc15.exe"
+# The following build rule assumes that the executable "opencv-3.4.16-vc14_vc15.exe"
 # is downloaded and the files are extracted to local.
 # If you install OpenCV separately, please modify the build rule accordingly.
 cc_library(
@@ -37,7 +37,7 @@ cc_library(
 )
 
 filegroup(
-    name = "opencv_libs",
+    name = "opencv_world_dll",
     srcs = [
         "x64/vc15/bin/opencv_world" + OPENCV_VERSION + ".dll",
     ],

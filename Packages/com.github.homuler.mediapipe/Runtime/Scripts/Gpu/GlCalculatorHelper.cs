@@ -5,15 +5,14 @@
 // https://opensource.org/licenses/MIT.
 
 using System;
-using System.Runtime.InteropServices;
 
 namespace Mediapipe
 {
 
   public class GlCalculatorHelper : MpResourceHandle
   {
-    public delegate IntPtr NativeGlStatusFunction();
-    public delegate Status GlStatusFunction();
+    public delegate Status.StatusArgs NativeGlStatusFunction();
+    public delegate void GlFunction();
 
     public GlCalculatorHelper() : base()
     {
@@ -46,30 +45,20 @@ namespace Mediapipe
       return new Status(statusPtr);
     }
 
-    public Status RunInGlContext(GlStatusFunction glStatusFunc)
+    public Status RunInGlContext(GlFunction glStatusFunc)
     {
-      Status tmpStatus = null;
-
-      NativeGlStatusFunction nativeGlStatusFunc = () =>
+      return RunInGlContext(() =>
       {
         try
         {
-          tmpStatus = glStatusFunc();
+          glStatusFunc();
+          return Status.StatusArgs.Ok();
         }
         catch (Exception e)
         {
-          tmpStatus = Status.FailedPrecondition(e.ToString());
+          return Status.StatusArgs.Internal(e.ToString());
         }
-        return tmpStatus.mpPtr;
-      };
-
-      var nativeGlStatusFuncHandle = GCHandle.Alloc(nativeGlStatusFunc, GCHandleType.Pinned);
-      var status = RunInGlContext(nativeGlStatusFunc);
-      nativeGlStatusFuncHandle.Free();
-
-      if (tmpStatus != null) { tmpStatus.Dispose(); }
-
-      return status;
+      });
     }
 
     public GlTexture CreateSourceTexture(ImageFrame imageFrame)

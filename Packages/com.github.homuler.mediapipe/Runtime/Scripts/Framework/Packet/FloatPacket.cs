@@ -10,8 +10,12 @@ namespace Mediapipe
 {
   public class FloatPacket : Packet<float>
   {
-    public FloatPacket() : base() { }
+    /// <summary>
+    ///   Creates an empty <see cref="FloatPacket" /> instance.
+    /// </summary>
+    public FloatPacket() : base(true) { }
 
+    [UnityEngine.Scripting.Preserve]
     public FloatPacket(IntPtr ptr, bool isOwner = true) : base(ptr, isOwner) { }
 
     public FloatPacket(float value) : base()
@@ -25,6 +29,11 @@ namespace Mediapipe
       UnsafeNativeMethods.mp__MakeFloatPacket_At__f_Rt(value, timestamp.mpPtr, out var ptr).Assert();
       GC.KeepAlive(timestamp);
       this.ptr = ptr;
+    }
+
+    public FloatPacket At(Timestamp timestamp)
+    {
+      return At<FloatPacket>(timestamp);
     }
 
     public override float Get()

@@ -11,8 +11,18 @@ namespace Mediapipe
 {
   public class ClassificationListVectorPacket : Packet<List<ClassificationList>>
   {
-    public ClassificationListVectorPacket() : base() { }
+    /// <summary>
+    ///   Creates an empty <see cref="ClassificationListVectorPacket" /> instance.
+    /// </summary>
+    public ClassificationListVectorPacket() : base(true) { }
+
+    [UnityEngine.Scripting.Preserve]
     public ClassificationListVectorPacket(IntPtr ptr, bool isOwner = true) : base(ptr, isOwner) { }
+
+    public ClassificationListVectorPacket At(Timestamp timestamp)
+    {
+      return At<ClassificationListVectorPacket>(timestamp);
+    }
 
     public override List<ClassificationList> Get()
     {

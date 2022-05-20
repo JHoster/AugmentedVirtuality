@@ -10,8 +10,18 @@ namespace Mediapipe
 {
   public class DetectionPacket : Packet<Detection>
   {
-    public DetectionPacket() : base() { }
+    /// <summary>
+    ///   Creates an empty <see cref="DetectionPacket" /> instance.
+    /// </summary>
+    public DetectionPacket() : base(true) { }
+
+    [UnityEngine.Scripting.Preserve]
     public DetectionPacket(IntPtr ptr, bool isOwner = true) : base(ptr, isOwner) { }
+
+    public DetectionPacket At(Timestamp timestamp)
+    {
+      return At<DetectionPacket>(timestamp);
+    }
 
     public override Detection Get()
     {

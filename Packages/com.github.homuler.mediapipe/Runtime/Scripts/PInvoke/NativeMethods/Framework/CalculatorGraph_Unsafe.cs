@@ -15,9 +15,6 @@ namespace Mediapipe
     public static extern MpReturnCode mp_CalculatorGraph__(out IntPtr graph);
 
     [DllImport(MediaPipeLibrary, ExactSpelling = true)]
-    public static extern MpReturnCode mp_CalculatorGraph__PKc(string textFormatConfig, out IntPtr graph);
-
-    [DllImport(MediaPipeLibrary, ExactSpelling = true)]
     public static extern MpReturnCode mp_CalculatorGraph__PKc_i(byte[] serializedConfig, int size, out IntPtr graph);
 
     [DllImport(MediaPipeLibrary, ExactSpelling = true)]
@@ -34,7 +31,7 @@ namespace Mediapipe
     public static extern MpReturnCode mp_CalculatorGraph__Config(IntPtr graph, out SerializedProto serializedProto);
 
     [DllImport(MediaPipeLibrary, ExactSpelling = true)]
-    public static extern MpReturnCode mp_CalculatorGraph__ObserveOutputStream__PKc_PF_b(IntPtr graph, string streamName,
+    public static extern MpReturnCode mp_CalculatorGraph__ObserveOutputStream__PKc_PF_b(IntPtr graph, string streamName, int streamId,
         [MarshalAs(UnmanagedType.FunctionPtr)] CalculatorGraph.NativePacketCallback packetCallback, [MarshalAs(UnmanagedType.I1)] bool observeTimestampBounds, out IntPtr status);
 
     [DllImport(MediaPipeLibrary, ExactSpelling = true)]

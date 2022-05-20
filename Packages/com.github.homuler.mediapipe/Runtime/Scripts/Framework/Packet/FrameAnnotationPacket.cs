@@ -10,8 +10,18 @@ namespace Mediapipe
 {
   public class FrameAnnotationPacket : Packet<FrameAnnotation>
   {
-    public FrameAnnotationPacket() : base() { }
+    /// <summary>
+    ///   Creates an empty <see cref="FrameAnnotationPacket" /> instance.
+    /// </summary>
+    public FrameAnnotationPacket() : base(true) { }
+
+    [UnityEngine.Scripting.Preserve]
     public FrameAnnotationPacket(IntPtr ptr, bool isOwner = true) : base(ptr, isOwner) { }
+
+    public FrameAnnotationPacket At(Timestamp timestamp)
+    {
+      return At<FrameAnnotationPacket>(timestamp);
+    }
 
     public override FrameAnnotation Get()
     {

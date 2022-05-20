@@ -2,6 +2,117 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.3](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.9.2...v0.9.3) (2022-05-16)
+
+### [0.9.2](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.9.1...v0.9.2) (2022-05-16)
+
+
+### Bug Fixes
+
+* Enumerator can be invalid when an item is deleted ([#565](https://github.com/homuler/MediaPipeUnityPlugin/issues/565)) ([d8e061a](https://github.com/homuler/MediaPipeUnityPlugin/commit/d8e061a1ea5668e4b0c3ec4a3ca1abb3232f1c0c))
+* **plugin:** check if the target local asset is missing ([#562](https://github.com/homuler/MediaPipeUnityPlugin/issues/562)) ([e3fa454](https://github.com/homuler/MediaPipeUnityPlugin/commit/e3fa454f30bced1f9342e8a3b41951dbe9eebc03))
+* **plugin:** preserve Packet constructors for Reflection ([#561](https://github.com/homuler/MediaPipeUnityPlugin/issues/561)) ([a6f27b1](https://github.com/homuler/MediaPipeUnityPlugin/commit/a6f27b127440825aa794a6744e1c0a7d2c6431ed))
+* **plugin:** prevent Status returned by a packet callback from being GCed prematurely ([#563](https://github.com/homuler/MediaPipeUnityPlugin/issues/563)) ([f4301af](https://github.com/homuler/MediaPipeUnityPlugin/commit/f4301af93dcca68514311d44ad6014c5b8ea5523))
+* **sample:** dispose OutputStream if only it exists ([#564](https://github.com/homuler/MediaPipeUnityPlugin/issues/564)) ([dcee215](https://github.com/homuler/MediaPipeUnityPlugin/commit/dcee215092b169a155d7780370d9b055df46d956))
+* **sample:** the default video/image is not selected ([#543](https://github.com/homuler/MediaPipeUnityPlugin/issues/543)) ([77ba1a4](https://github.com/homuler/MediaPipeUnityPlugin/commit/77ba1a4d2249b8db09b3a1e975a01f6e50d21e33))
+
+### [0.9.1](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.9.0...v0.9.1) (2022-04-19)
+
+
+### Features
+
+* **sample:** Holistic Segmentation Mask ([#521](https://github.com/homuler/MediaPipeUnityPlugin/issues/521)) ([30e968c](https://github.com/homuler/MediaPipeUnityPlugin/commit/30e968c66a168f69c33084593ee68e5b4a7e9533))
+* **sample:** MIN_DETECTION_CONFIDENCE and MIN_TRACKING_CONFIDENCE ([#523](https://github.com/homuler/MediaPipeUnityPlugin/issues/523)) ([5222faa](https://github.com/homuler/MediaPipeUnityPlugin/commit/5222faa9a21e1c523614f8c082b92ec521c2005b))
+* **sample:** Pose Segmentation Mask ([#520](https://github.com/homuler/MediaPipeUnityPlugin/issues/520)) ([b25430d](https://github.com/homuler/MediaPipeUnityPlugin/commit/b25430d68f4963940b6f79c5e7209e2a8f1bd6d6))
+* **sample:** Selfie Segmentation ([#522](https://github.com/homuler/MediaPipeUnityPlugin/issues/522)) ([7d6090d](https://github.com/homuler/MediaPipeUnityPlugin/commit/7d6090de1ae39e040e9a463228ae73cc5a388b04))
+* set Protobuf LogHandler ([#526](https://github.com/homuler/MediaPipeUnityPlugin/issues/526)) ([cc3ac5c](https://github.com/homuler/MediaPipeUnityPlugin/commit/cc3ac5ce25d1f2af3db6f8da4ba44897e31277b3))
+
+
+### Bug Fixes
+
+* constructor should throw if it fails to initialize ([#533](https://github.com/homuler/MediaPipeUnityPlugin/issues/533)) ([e58408e](https://github.com/homuler/MediaPipeUnityPlugin/commit/e58408e142e8aec45dd90351bd021e42c54204a5))
+
+## [0.9.0](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.8.4...v0.9.0) (2022-04-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* implement ImageFrame#TryReadChannel and MaskShader (#507)
+
+### Features
+
+* OutputStream API ([#516](https://github.com/homuler/MediaPipeUnityPlugin/issues/516)) ([2679000](https://github.com/homuler/MediaPipeUnityPlugin/commit/2679000e86942353a7e165932f8ee6fc127c1abf))
+
+
+### Bug Fixes
+
+* check Packet types at compile-time more properly ([#509](https://github.com/homuler/MediaPipeUnityPlugin/issues/509)) ([d03895d](https://github.com/homuler/MediaPipeUnityPlugin/commit/d03895d1e63c1f4e60c4e080b8cd89fbd9a3e797))
+* forget to commit ([#510](https://github.com/homuler/MediaPipeUnityPlugin/issues/510)) ([81fe7f8](https://github.com/homuler/MediaPipeUnityPlugin/commit/81fe7f8f809aa4eab095e474762a04bd11e56698))
+* ignore vertically_flipped in sync mode ([#517](https://github.com/homuler/MediaPipeUnityPlugin/issues/517)) ([7d080e3](https://github.com/homuler/MediaPipeUnityPlugin/commit/7d080e3b20530586b0158fdec3bd00115ca4df03))
+* **plugin:** fail to initialize GlSyncPoint ([#515](https://github.com/homuler/MediaPipeUnityPlugin/issues/515)) ([11188cb](https://github.com/homuler/MediaPipeUnityPlugin/commit/11188cb699b14f443aed8aac17b983b4271703f6))
+
+
+* implement ImageFrame#TryReadChannel and MaskShader ([#507](https://github.com/homuler/MediaPipeUnityPlugin/issues/507)) ([05adcb5](https://github.com/homuler/MediaPipeUnityPlugin/commit/05adcb54c487441075824dd502c2e31c2cf5c62b))
+
+### [0.8.4](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.8.3...v0.8.4) (2022-03-29)
+
+
+### Features
+
+* **plugin:** port ValidatedGraphConfig API ([#477](https://github.com/homuler/MediaPipeUnityPlugin/issues/477)) ([bde6874](https://github.com/homuler/MediaPipeUnityPlugin/commit/bde68746974b84ad7e8723c0fa927dcddc842907))
+* **sample:** implement MIN_(DETECTION|TRACKING)_CONFIDENCE ([#483](https://github.com/homuler/MediaPipeUnityPlugin/issues/483)) ([13c2a38](https://github.com/homuler/MediaPipeUnityPlugin/commit/13c2a38e129b1d0de59867ee57f65920fdee8f30))
+
+
+### Bug Fixes
+
+* install OpenCV 3.4.16 on Docker Windows Containers ([#484](https://github.com/homuler/MediaPipeUnityPlugin/issues/484)) ([4210673](https://github.com/homuler/MediaPipeUnityPlugin/commit/42106737e3d4b57efddd2e4d8e646b7b8e283fba))
+* **sample:** Anchor position is flipped ([#506](https://github.com/homuler/MediaPipeUnityPlugin/issues/506)) ([98cb0c4](https://github.com/homuler/MediaPipeUnityPlugin/commit/98cb0c432d710623a53994cdf3a47e9e1db1ff5a))
+* **sample:** front camera image is not rotated properly ([#504](https://github.com/homuler/MediaPipeUnityPlugin/issues/504)) ([9d47f7c](https://github.com/homuler/MediaPipeUnityPlugin/commit/9d47f7c0e7cea557c4feba3dd468901c65bd601c))
+* **sample:** GetNativeTexturePtr may never return on M1 Mac ([#505](https://github.com/homuler/MediaPipeUnityPlugin/issues/505)) ([9d7e390](https://github.com/homuler/MediaPipeUnityPlugin/commit/9d7e390b6012b2f5ebed14de599d90821f4f7f62))
+
+### [0.8.3](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.8.2...v0.8.3) (2022-02-27)
+
+
+### Features
+
+* add Non-Blocking Sync mode to the sample app ([#471](https://github.com/homuler/MediaPipeUnityPlugin/issues/471)) ([3a33e9d](https://github.com/homuler/MediaPipeUnityPlugin/commit/3a33e9ddb4c1069a0d44a20c8e459a8d8ee8d568))
+* compile with emscripten ([#395](https://github.com/homuler/MediaPipeUnityPlugin/issues/395)) ([de44dac](https://github.com/homuler/MediaPipeUnityPlugin/commit/de44dac3ad5261212d95bc59f57ef1c65802de11))
+
+
+### Bug Fixes
+
+* build AAR on Docker ([#441](https://github.com/homuler/MediaPipeUnityPlugin/issues/441)) ([75a736a](https://github.com/homuler/MediaPipeUnityPlugin/commit/75a736a8753850794ed7587561ac437d72ce3785))
+* configure plugin settings ([#381](https://github.com/homuler/MediaPipeUnityPlugin/issues/381)) ([ee27e24](https://github.com/homuler/MediaPipeUnityPlugin/commit/ee27e24e963c5485a36f5a63fc7215e732f4d49f))
+* memory for RenderTexture leaks ([#451](https://github.com/homuler/MediaPipeUnityPlugin/issues/451)) ([6a1d120](https://github.com/homuler/MediaPipeUnityPlugin/commit/6a1d120a531495941297bb4d41bcf20027b942db))
+* no need to pin callbacks ([#460](https://github.com/homuler/MediaPipeUnityPlugin/issues/460)) ([0dafc8a](https://github.com/homuler/MediaPipeUnityPlugin/commit/0dafc8ac1359f759a23bda20ba392dacfc75df2b))
+* OpenCV installation path is incorrect ([#459](https://github.com/homuler/MediaPipeUnityPlugin/issues/459)) ([6e60f75](https://github.com/homuler/MediaPipeUnityPlugin/commit/6e60f75a1056ad3f220215f32341d8bb1127a689))
+* **plugin:** load mediapipe_c.dll on Windows properly ([#455](https://github.com/homuler/MediaPipeUnityPlugin/issues/455)) ([e237ba7](https://github.com/homuler/MediaPipeUnityPlugin/commit/e237ba78fe0b8c024304248b1855777ed4b380af))
+* **sample:** smooth_landmarks option is not working ([#454](https://github.com/homuler/MediaPipeUnityPlugin/issues/454)) ([c90861c](https://github.com/homuler/MediaPipeUnityPlugin/commit/c90861cc7ac4f42e13e2906ad056e562e80a77f7))
+* SerializedProto's memory leaks ([#461](https://github.com/homuler/MediaPipeUnityPlugin/issues/461)) ([ac6316d](https://github.com/homuler/MediaPipeUnityPlugin/commit/ac6316d63fd882c562e3c5c10ffab86a58d71ccb))
+* typo and missing [Test] ([#426](https://github.com/homuler/MediaPipeUnityPlugin/issues/426)) ([018bd9f](https://github.com/homuler/MediaPipeUnityPlugin/commit/018bd9ffccdaaf2365b0590ba24fbee7f46b9be8))
+
+### [0.8.2](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.8.1...v0.8.2) (2021-12-15)
+
+
+### Features
+
+* **deps:** MediaPipe v0.8.9 ([#376](https://github.com/homuler/MediaPipeUnityPlugin/issues/376)) ([a16d74c](https://github.com/homuler/MediaPipeUnityPlugin/commit/a16d74c0a170f3bf271df7a09a7b63f46a55a5f1))
+
+### [0.8.1](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.8.0...v0.8.1) (2021-12-02)
+
+
+### Bug Fixes
+
+* **sample:** Hand Landmarks color is wrong in Holistic scene ([b1a2720](https://github.com/homuler/MediaPipeUnityPlugin/commit/b1a2720f36ca3b44d124d8b7234ce5b0c4e33ebe))
+* **sample:** image is flipped in sync mode ([a3668be](https://github.com/homuler/MediaPipeUnityPlugin/commit/a3668befb8731a22a81a6e2e2cf489b9c951f5a7))
+* flip screen image when using front facing camera ([f04ba48](https://github.com/homuler/MediaPipeUnityPlugin/commit/f04ba48645c6668ff3ffa6d7cd51125b5add44e1))
+* releasing active render texture ([9537ec7](https://github.com/homuler/MediaPipeUnityPlugin/commit/9537ec76b8547d0e68a41232a6a1f62c486268b4))
+* **example:** model_complexity is ignored ([0d9db0b](https://github.com/homuler/MediaPipeUnityPlugin/commit/0d9db0b8f47aff82ccd4352322a8d2b5abfe509a))
+* **sample:** memory leaks when using VideoSource ([cab8e26](https://github.com/homuler/MediaPipeUnityPlugin/commit/cab8e26cb627f393f6dcbc3849b1675f39f56427))
+* build with bazel 4.2.1 on macOS ([4921db1](https://github.com/homuler/MediaPipeUnityPlugin/commit/4921db1d41e829a6503a22f91f88c40aa39555a2))
+* synchronize the input image and the output annotation ([#359](https://github.com/homuler/MediaPipeUnityPlugin/issues/359)) ([47598ce](https://github.com/homuler/MediaPipeUnityPlugin/commit/47598ce915863ab6218d88e1ef3ce93436b8e835))
+* validate bundle_id ([06423ca](https://github.com/homuler/MediaPipeUnityPlugin/commit/06423ca40c0a6d3daf8519505f62e8a7cd592719))
+
 ## [0.8.0](https://github.com/homuler/MediaPipeUnityPlugin/compare/v0.7.0...v0.8.0) (2021-11-22)
 
 

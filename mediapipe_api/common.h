@@ -46,7 +46,19 @@ struct StructArray {
   int size;
 };
 
-#ifndef _WIN32
+typedef void FreeHGlobal(void* hglobal);
+
+extern FreeHGlobal* freeHGlobal;
+
+#if defined(_WIN32) || defined(__EMSCRIPTEN__)
+#define MEDIAPIPE_DISABLE_SIGABRT_HANDLER
+#endif
+
+#if defined(__EMSCRIPTEN__)
+#define MEDIAPIPE_IGNORE_EXCEPTION
+#endif
+
+#ifndef MEDIAPIPE_DISABLE_SIGABRT_HANDLER
 extern thread_local struct sigaction orig_act;
 extern thread_local sigjmp_buf abrt_jbuf;
 
@@ -56,9 +68,21 @@ extern void sigabrt_handler(int sig);
 }  // namespace mp_api
 
 // TODO: make code more readable
-#define TRY                                            \
+#ifdef MEDIAPIPE_IGNORE_EXCEPTION
+#define TRY            \
+  auto volatile _mp_return_code = MpReturnCode::Unset; \
+  {
+#else
+#define TRY             \
   auto volatile _mp_return_code = MpReturnCode::Unset; \
   try {
+#endif  // MEDIAPIPE_IGNORE_EXCEPTION
+
+#ifdef MEDIAPIPE_IGNORE_EXCEPTION
+#define CATCH_EXCEPTION \
+  }                     \
+  return _mp_return_code;
+#else
 #define CATCH_EXCEPTION                            \
   }                                                \
   catch (std::exception & e) {                     \
@@ -72,8 +96,9 @@ extern void sigabrt_handler(int sig);
     _mp_return_code = MpReturnCode::UnknownError;  \
   }                                                \
   return _mp_return_code;
+#endif
 
-#ifdef _WIN32
+#ifdef MEDIAPIPE_DISABLE_SIGABRT_HANDLER
 #define TRY_ALL TRY
 #define CATCH_ALL CATCH_EXCEPTION
 #else
@@ -94,7 +119,7 @@ extern void sigabrt_handler(int sig);
   }                                               \
   sigaction(SIGABRT, &mp_api::orig_act, nullptr); \
   CATCH_EXCEPTION
-#endif  // _WIN32
+#endif  // MEDIAPIPE_DISABLE_SIGABRT_HANDLER
 
 #define RETURN_CODE(code) _mp_return_code = code
 
@@ -105,4 +130,11 @@ extern void sigabrt_handler(int sig);
 #endif  // _WIN32
 
 #define MP_CAPI(rettype) MP_CAPI_EXPORT extern rettype CDECL
+
+extern "C" {
+
+MP_CAPI(void) mp_api__SetFreeHGlobal(mp_api::FreeHGlobal* freeHGlobal);
+
+}  // extern "C"
+
 #endif  // MEDIAPIPE_API_COMMON_H_

@@ -19,6 +19,7 @@ cc_library(
         "//mediapipe_api/framework:calculator_graph",
         "//mediapipe_api/framework:output_stream_poller",
         "//mediapipe_api/framework:timestamp",
+        "//mediapipe_api/framework:validated_graph_config",
         "//mediapipe_api/framework/formats:classification",
         "//mediapipe_api/framework/formats:detection",
         "//mediapipe_api/framework/formats:image_frame",
@@ -62,18 +63,33 @@ cc_binary(
 )
 
 cc_binary(
-    name = "libmediapipe_c.dll",
+    name = "mediapipe_c.dll",
     linkshared = True,
     linkstatic = True,
     visibility = ["//visibility:public"],
     deps = [":mediapipe_c"],
 )
 
+cc_binary(
+    name = "libmediapipe_c.bc",
+    linkopts = [
+        "-flto",
+        "--oformat=object",
+        "-s SIDE_MODULE=1",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":mediapipe_c",
+        "//mediapipe_api/external:wasm_patch",
+    ],
+)
+
 alias(
     name = "libmediapipe_c",
     actual = select({
         "@com_google_mediapipe//mediapipe:macos": ":libmediapipe_c.dylib",
-        "@com_google_mediapipe//mediapipe:windows": ":libmediapipe_c.dll",
+        "@com_google_mediapipe//mediapipe:windows": ":mediapipe_c.dll",
+        "@com_google_mediapipe//mediapipe:emscripten": ":libmediapipe_c.bc",
         "//conditions:default": ":libmediapipe_c.so",
     }),
 )
@@ -100,6 +116,7 @@ cc_library(
             "@com_google_mediapipe//mediapipe/graphs/object_detection:desktop_tflite_calculators",
             "@com_google_mediapipe//mediapipe/graphs/object_detection_3d:desktop_cpu_calculators",
             "@com_google_mediapipe//mediapipe/graphs/pose_tracking:pose_tracking_cpu_deps",
+            "@com_google_mediapipe//mediapipe/graphs/selfie_segmentation:selfie_segmentation_cpu_deps",
             "@com_google_mediapipe//mediapipe/graphs/tracking:desktop_calculators",
         ],
         "//conditions:default": [
@@ -121,6 +138,7 @@ cc_library(
             "@com_google_mediapipe//mediapipe/graphs/object_detection:mobile_calculators",
             "@com_google_mediapipe//mediapipe/graphs/object_detection_3d:mobile_calculators",
             "@com_google_mediapipe//mediapipe/graphs/pose_tracking:pose_tracking_gpu_deps",
+            "@com_google_mediapipe//mediapipe/graphs/selfie_segmentation:selfie_segmentation_gpu_deps",
             "@com_google_mediapipe//mediapipe/graphs/tracking:mobile_calculators",
         ],
     }),
@@ -139,7 +157,10 @@ cc_library(
 
 pkg_zip(
     name = "mediapipe_desktop",
-    srcs = [":libmediapipe_c"],
+    srcs = [
+        ":libmediapipe_c",
+        "@opencv//:opencv_world_dll",
+    ],
 )
 
 pkg_asset(
@@ -153,7 +174,8 @@ pkg_asset(
         "@com_google_mediapipe//mediapipe/modules/face_detection:face_detection_short_range.tflite",
         "@com_google_mediapipe//mediapipe/modules/face_landmark:face_landmark.tflite",
         "@com_google_mediapipe//mediapipe/modules/face_landmark:face_landmark_with_attention.tflite",
-        "@com_google_mediapipe//mediapipe/modules/hand_landmark:hand_landmark.tflite",
+        "@com_google_mediapipe//mediapipe/modules/hand_landmark:hand_landmark_full.tflite",
+        "@com_google_mediapipe//mediapipe/modules/hand_landmark:hand_landmark_lite.tflite",
         "@com_google_mediapipe//mediapipe/modules/hand_landmark:handedness.txt",
         "@com_google_mediapipe//mediapipe/modules/holistic_landmark:hand_recrop.tflite",
         "@com_google_mediapipe//mediapipe/modules/iris_landmark:iris_landmark.tflite",
@@ -165,50 +187,38 @@ pkg_asset(
         "@com_google_mediapipe//mediapipe/modules/objectron:object_detection_3d_sneakers_1stage.tflite",
         "@com_google_mediapipe//mediapipe/modules/objectron:object_detection_oidv4_labelmap.txt",
         "@com_google_mediapipe//mediapipe/modules/objectron:object_detection_ssd_mobilenetv2_oidv4_fp16.tflite",
-        "@com_google_mediapipe//mediapipe/modules/palm_detection:palm_detection.tflite",
+        "@com_google_mediapipe//mediapipe/modules/palm_detection:palm_detection_full.tflite",
+        "@com_google_mediapipe//mediapipe/modules/palm_detection:palm_detection_lite.tflite",
         "@com_google_mediapipe//mediapipe/modules/pose_detection:pose_detection.tflite",
         "@com_google_mediapipe//mediapipe/modules/pose_landmark:pose_landmark_full.tflite",
         "@com_google_mediapipe//mediapipe/modules/pose_landmark:pose_landmark_heavy.tflite",
         "@com_google_mediapipe//mediapipe/modules/pose_landmark:pose_landmark_lite.tflite",
+        "@com_google_mediapipe//mediapipe/modules/selfie_segmentation:selfie_segmentation.tflite",
     ],
 )
 
 pkg_zip(
     name = "mediapipe_proto_srcs",
     srcs = [
-        "//mediapipe_api/framework:calculator_cs",
-        "//mediapipe_api/framework:calculator_options_cs",
-        "//mediapipe_api/framework:mediapipe_options_cs",
-        "//mediapipe_api/framework:packet_factory_cs",
-        "//mediapipe_api/framework:packet_generator_cs",
-        "//mediapipe_api/framework:status_handler_cs",
-        "//mediapipe_api/framework:stream_handler_cs",
-        "//mediapipe_api/framework/formats:classification_cs",
-        "//mediapipe_api/framework/formats:detection_cs",
-        "//mediapipe_api/framework/formats:landmark_cs",
-        "//mediapipe_api/framework/formats:location_data_cs",
-        "//mediapipe_api/framework/formats:matrix_data_cs",
-        "//mediapipe_api/framework/formats:rasterization_cs",
-        "//mediapipe_api/framework/formats:rect_cs",
-        "//mediapipe_api/graphs/instant_motion_tracking/calculators:sticker_buffer_cs",
-        "//mediapipe_api/graphs/object_detection_3d/calculators:model_matrix_cs",
-        "//mediapipe_api/modules/face_geometry/protos:face_geometry_cs",
-        "//mediapipe_api/modules/face_geometry/protos:mesh_3d_cs",
-        "//mediapipe_api/modules/objectron/calculators:a_r_capture_metadata_cs",
-        "//mediapipe_api/modules/objectron/calculators:annotation_data_cs",
-        "//mediapipe_api/modules/objectron/calculators:object_cs",
+        "//mediapipe_api/calculators/audio:proto_srcs",
+        "//mediapipe_api/calculators/core:proto_srcs",
+        "//mediapipe_api/calculators/image:proto_srcs",
+        "//mediapipe_api/calculators/tensor:proto_srcs",
+        "//mediapipe_api/calculators/tflite:proto_srcs",
+        "//mediapipe_api/calculators/util:proto_srcs",
+        "//mediapipe_api/calculators/video:proto_srcs",
+        "//mediapipe_api/framework:proto_srcs",
+        "//mediapipe_api/framework/formats:proto_srcs",
+        "//mediapipe_api/framework/formats/annotation:proto_srcs",
+        "//mediapipe_api/framework/formats/motion:proto_srcs",
+        "//mediapipe_api/framework/formats/object_detection:proto_srcs",
+        "//mediapipe_api/gpu:proto_srcs",
+        "//mediapipe_api/graphs/instant_motion_tracking/calculators:proto_srcs",
+        "//mediapipe_api/graphs/object_detection_3d/calculators:proto_srcs",
+        "//mediapipe_api/modules/face_geometry/protos:proto_srcs",
+        "//mediapipe_api/modules/holistic_landmark/calculators:proto_srcs",
+        "//mediapipe_api/modules/objectron/calculators:proto_srcs",
+        "//mediapipe_api/util:proto_srcs",
+        "//mediapipe_api/util/tracking:proto_srcs",
     ],
-    # TODO: keep directory structure
-)
-
-pkg_zip(
-    name = "opencv_libs",
-    srcs = select({
-        "@opencv//:source_build": ["@opencv//:opencv_libs"],
-        "@com_google_mediapipe//mediapipe:windows": ["@windows_opencv//:opencv_libs"],
-        "@com_google_mediapipe//mediapipe:macos": [],
-        "@com_google_mediapipe//mediapipe:android": [],
-        "@com_google_mediapipe//mediapipe:ios": [],
-        "//conditions:default": ["@linux_opencv//:opencv_libs"],
-    }),
 )

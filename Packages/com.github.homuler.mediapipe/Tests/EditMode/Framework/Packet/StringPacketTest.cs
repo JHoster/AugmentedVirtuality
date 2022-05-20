@@ -6,7 +6,6 @@
 
 using Mediapipe;
 using NUnit.Framework;
-using System;
 using System.Text.RegularExpressions;
 
 namespace Tests
@@ -100,6 +99,29 @@ namespace Tests
     }
     #endregion
 
+    #region #At
+    [Test]
+    public void At_ShouldReturnNewPacketWithTimestamp()
+    {
+      using (var timestamp = new Timestamp(1))
+      {
+        var str = "str";
+        var packet = new StringPacket(str).At(timestamp);
+        Assert.AreEqual(packet.Get(), str);
+        Assert.AreEqual(packet.Timestamp(), timestamp);
+
+        using (var newTimestamp = new Timestamp(2))
+        {
+          var newPacket = packet.At(newTimestamp);
+          Assert.AreEqual(newPacket.Get(), str);
+          Assert.AreEqual(newPacket.Timestamp(), newTimestamp);
+        }
+
+        Assert.AreEqual(packet.Timestamp(), timestamp);
+      }
+    }
+    #endregion
+
     #region #GetByteArray
     [Test]
     public void GetByteArray_ShouldReturnByteArray()
@@ -115,13 +137,29 @@ namespace Tests
 
     #region #Consume
     [Test]
-    public void Consume_ShouldThrowNotSupportedException()
+    public void Consume_ShouldReturnStatusOrString_When_PacketIsEmpty()
     {
       using (var packet = new StringPacket())
       {
-#pragma warning disable IDE0058
-        Assert.Throws<NotSupportedException>(() => { packet.Consume(); });
-#pragma warning restore IDE0058
+        using (var statusOrString = packet.Consume())
+        {
+          Assert.False(statusOrString.Ok());
+          Assert.AreEqual(statusOrString.status.Code(), Status.StatusCode.Internal);
+        }
+      }
+    }
+
+    [Test]
+    public void Consume_ShouldReturnStatusOrString_When_PacketIsNotEmpty()
+    {
+      using (var packet = new StringPacket("abc"))
+      {
+        using (var statusOrString = packet.Consume())
+        {
+          Assert.True(statusOrString.Ok());
+          Assert.AreEqual(statusOrString.Value(), "abc");
+        }
+        Assert.True(packet.IsEmpty());
       }
     }
     #endregion
