@@ -53,7 +53,7 @@ namespace Mediapipe.Unity
     {
       if (ActivateFor(target))
       {
-        var position = GetScreenRect().GetPoint(target, scale, rotationAngle, isMirrored);
+        var position = GetAnnotationLayer().GetLocalPosition(target, scale, rotationAngle, isMirrored);
         if (!visualizeZ)
         {
           position.z = 0.0f;
@@ -66,7 +66,7 @@ namespace Mediapipe.Unity
     {
       if (ActivateFor(target))
       {
-        var position = GetScreenRect().GetPoint(target, rotationAngle, isMirrored);
+        var position = GetAnnotationLayer().GetLocalPosition(target, rotationAngle, isMirrored);
         if (!visualizeZ)
         {
           position.z = 0.0f;
@@ -79,7 +79,7 @@ namespace Mediapipe.Unity
     {
       if (ActivateFor(target))
       {
-        var position = GetScreenRect().GetPoint(target, rotationAngle, isMirrored);
+        var position = GetAnnotationLayer().GetLocalPosition(target, rotationAngle, isMirrored);
         transform.localPosition = position;
       }
     }
@@ -88,7 +88,7 @@ namespace Mediapipe.Unity
     {
       if (ActivateFor(target))
       {
-        var position = GetScreenRect().GetPoint(target, focalLength, principalPoint, zScale, rotationAngle, isMirrored);
+        var position = GetAnnotationLayer().GetLocalPosition(target, focalLength, principalPoint, zScale, rotationAngle, isMirrored);
         if (!visualizeZ)
         {
           position.z = 0.0f;
@@ -113,7 +113,7 @@ namespace Mediapipe.Unity
     {
       if (ActivateFor(target))
       {
-        Draw(GetScreenRect().GetPoint(target, rotationAngle, isMirrored));
+        Draw(GetAnnotationLayer().GetLocalPosition(target, rotationAngle, isMirrored));
         SetColor(GetColor(target.Score, threshold));
       }
     }

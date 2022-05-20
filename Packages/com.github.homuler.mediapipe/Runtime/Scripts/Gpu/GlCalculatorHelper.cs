@@ -11,8 +11,8 @@ namespace Mediapipe
 
   public class GlCalculatorHelper : MpResourceHandle
   {
-    public delegate Status.StatusArgs NativeGlStatusFunction();
-    public delegate void GlFunction();
+    public delegate IntPtr NativeGlStatusFunction();
+    public delegate Status GlStatusFunction();
 
     public GlCalculatorHelper() : base()
     {
@@ -45,20 +45,26 @@ namespace Mediapipe
       return new Status(statusPtr);
     }
 
-    public Status RunInGlContext(GlFunction glStatusFunc)
+    public Status RunInGlContext(GlStatusFunction glStatusFunc)
     {
-      return RunInGlContext(() =>
+      Status tmpStatus = null;
+
+      var status = RunInGlContext(() =>
       {
         try
         {
-          glStatusFunc();
-          return Status.StatusArgs.Ok();
+          tmpStatus = glStatusFunc();
         }
         catch (Exception e)
         {
-          return Status.StatusArgs.Internal(e.ToString());
+          tmpStatus = Status.FailedPrecondition(e.ToString());
         }
+        return tmpStatus.mpPtr;
       });
+
+      if (tmpStatus != null) { tmpStatus.Dispose(); }
+
+      return status;
     }
 
     public GlTexture CreateSourceTexture(ImageFrame imageFrame)

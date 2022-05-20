@@ -15,7 +15,7 @@
 
 extern "C" {
 
-typedef mp_api::StatusArgs NativeGlStatusFunction();
+typedef absl::Status* NativeGlStatusFunction();
 
 /** GlCalculatorHelper API */
 MP_CAPI(MpReturnCode) mp_GlCalculatorHelper__(mediapipe::GlCalculatorHelper** gl_calculator_helper_out);

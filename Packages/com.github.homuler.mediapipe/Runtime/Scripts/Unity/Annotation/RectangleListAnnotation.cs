@@ -36,7 +36,7 @@ namespace Mediapipe.Unity
       ApplyLineWidth(_lineWidth);
     }
 
-    public void Draw(IList<Rect> targets, Vector2Int imageSize)
+    public void Draw(IList<Rect> targets, Vector2 imageSize)
     {
       if (ActivateFor(targets))
       {
