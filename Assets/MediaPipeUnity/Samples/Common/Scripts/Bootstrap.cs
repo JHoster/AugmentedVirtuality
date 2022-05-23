@@ -107,6 +107,10 @@ namespace Mediapipe.Unity
     {
       switch (imageSourceType)
       {
+        case ImageSourceType.CamTextureSource:
+          {
+            return GetComponent<CamTextureSource>();
+          }
         case ImageSourceType.WebCamera:
           {
             return GetComponent<WebCamSource>();

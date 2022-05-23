@@ -26,6 +26,10 @@ namespace Mediapipe.Unity
     {
       get
       {
+        if (_ImageSource is CamTextureSource)
+        {
+          return ImageSourceType.CamTextureSource;
+        }
         if (_ImageSource is WebCamSource)
         {
           return ImageSourceType.WebCamera;
