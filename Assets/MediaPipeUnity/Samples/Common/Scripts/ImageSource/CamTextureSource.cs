@@ -40,7 +40,7 @@ namespace Mediapipe.Unity
     private static readonly object _PermissionLock = new object();
     private static bool _IsPermitted = false;
 
-    private WebCamTexture _webCamTexture;
+    public WebCamTexture _webCamTexture;
     private WebCamTexture webCamTexture
     {
       get => _webCamTexture;
